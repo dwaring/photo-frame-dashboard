@@ -5,7 +5,8 @@
 Mac browser prototype based on wesbos/photo-frame-dashboard at 033b5ac.
 The UI still displays upstream sample data. No personal service is connected yet.
 Initial channels: Google Calendar, Adelaide weather, Spotify, Trello, photos.
-GitHub owner: dwaring. Remote fork pending GitHub device authentication.
+GitHub owner: dwaring. Fork: https://github.com/dwaring/photo-frame-dashboard
+Personal starting branch: personal-dashboard. Main tracks the upstream baseline.
 
 ## Local development
 
