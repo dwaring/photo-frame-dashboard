@@ -2,3 +2,8 @@ node_modules
 dist
 .wrangler
 kiosk/build
+config/local.json
+.env
+.env.*
+!.env.example
+public/personal/

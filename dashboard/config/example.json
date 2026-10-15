@@ -1,0 +1,11 @@
+{
+  "title": "My Home HQ",
+  "peopleNames": {},
+  "channels": {
+    "googleCalendar": { "enabled": false },
+    "weather": { "enabled": false, "location": "Adelaide, AU", "timezone": "Australia/Adelaide" },
+    "spotify": { "enabled": false },
+    "trello": { "enabled": false },
+    "photos": { "enabled": false }
+  }
+}
