@@ -1,6 +1,7 @@
 // Cloudflare Access protects the entire Worker, including its static assets.
-// OAuth integrations are deliberately unavailable until hosted authorization exists.
+// Calendar OAuth remains unavailable until its hosted authorization exists.
 import { BOM_URL, FORECAST_URL } from '../server/bom.js';
+export { ChatgptUsage } from './chatgpt-usage.js';
 
 function json(body, status = 200) {
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -11,6 +12,16 @@ export default {
     const path = new URL(request.url).pathname;
     if (!path.startsWith('/api/')) return env.ASSETS.fetch(request);
     if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405);
+    if (path === '/api/chatgpt/usage') {
+      // Fail closed if Access is absent: these are personal account statistics.
+      if (!request.headers.get('Cf-Access-Jwt-Assertion')) return json({ error: 'Sign-in required' }, 401);
+      if (!env.CODEX_AUTH_JSON || !env.CHATGPT_USAGE) return json({ connected: false, reason: 'not-configured' });
+      try {
+        return json(await env.CHATGPT_USAGE.getByName('personal').usage());
+      } catch {
+        return json({ connected: false, reason: 'unavailable' }, 503);
+      }
+    }
     if (path === '/api/google-calendar/status') {
       return json({ connected: false, selected: false });
     }

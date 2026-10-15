@@ -10,9 +10,14 @@ Adelaide current weather uses BoM West Terrace / ngayirdapira station 94648
 (023000). Open-Meteo supplies the separately labelled hourly/daily forecasts.
 Google Calendar has a local read-only OAuth connection and shared-calendar picker;
 it is not connected until a client is configured, consent granted, and a calendar selected.
-Agents now shows only ChatGPT Pro (user-declared plan, account not verified).
-Personal live usage is not connected: no supported personal usage API was
-identified. The widget links to ChatGPT Settings → Usage and shows no sample stats.
+Agents shows only ChatGPT. Live quota windows and token activity use Codex
+app-server, with the actual plan returned by the account. A local read-only probe
+succeeded and confirmed Plus, which the user confirmed is the correct plan.
+The Cloudflare Container/Durable Object adapter is implemented and built.
+A separate service sign-in succeeded and also reported Plus. Deployment is blocked
+because Cloudflare requires the Workers Paid plan for Containers on this account;
+credentials have not been uploaded. Hosted verification remains pending. See docs/chatgpt-usage.md.
+Coverage of all ChatGPT conversations is not verified. No sample usage is shown.
 Other channels still display upstream sample data and are not connected.
 Initial channels: Google Calendar, Adelaide weather, shared shopping/groceries,
 Spotify, Todoist, photos. Shopping currently uses in-memory demo data; it has
