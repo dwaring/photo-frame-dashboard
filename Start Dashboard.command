@@ -6,4 +6,4 @@ if [[ ! -d node_modules ]]; then
 fi
 echo 'Home HQ: http://127.0.0.1:5173/'
 echo 'Keep this Terminal window open. Press Control-C to stop.'
-npm run dev -- --host 127.0.0.1 --port 5173 --strictPort --open
+npm run dev -- --host 127.0.0.1 --port 5173 --strictPort

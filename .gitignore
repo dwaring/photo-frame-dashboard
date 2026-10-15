@@ -20,3 +20,6 @@ scripts/si006-webview-overlay/build/
 
 # Private per-frame records (docs/frame-records.md). No trailing slash, so a symlink is ignored too.
 /frames
+
+# Server-only OAuth clients, tokens, and calendar selections.
+/.private/

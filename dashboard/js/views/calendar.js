@@ -197,7 +197,6 @@
       '<button class="icon-btn" data-nav="1" aria-label="Next">' + App.icon('right', 24) + '</button>' +
       '<button class="btn btn--ghost' + (isToday ? ' is-hidden' : '') + '" data-today>Today</button>' +
       '<div class="seg">' + MODES.map(function (m) { return '<button class="' + (V.mode === m[0] ? 'is-on' : '') + '" data-mode="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div>' +
-      '<button class="fab" data-add aria-label="Add event">' + App.icon('plus', 26) + '</button>' +
       '</header>';
   }
 
@@ -237,7 +236,6 @@
       return render();
     }
     if ((t = e.target.closest('[data-day]'))) { V.mode = 'day'; V.date = new Date(+t.dataset.day); V.scroll = null; return render(); }
-    if ((t = e.target.closest('[data-add]'))) return addSheet();
   }
 
   // Swipe left/right to change day (the only swipe gesture in the app)
@@ -278,72 +276,6 @@
         return '<button class="more-row" data-ev="' + e.id + '" style="' + App.pstyle(App.evColor(e)) + '"><i></i><b>' + App.esc(e.title) + '</b><span>' + App.fmt.range(e.start, e.end) + '</span></button>';
       }).join('') + '</div></div>', {
       onMount: function (s) { s.addEventListener('click', function (ev) { var t = ev.target.closest('[data-ev]'); if (t) App.eventSheet(App.findEvent(t.dataset.ev)); }); }
-    });
-  }
-
-  function addSheet() {
-    var now = App.now();
-    var st = { who: [], day: 0, time: '15:30', dur: 60, title: '' };
-    var days = [0, 1, 2, 3, 4];
-    var times = [['08:00', '8 AM'], ['12:00', 'Noon'], ['15:30', '3:30 PM'], ['16:30', '4:30 PM'], ['18:00', '6 PM'], ['19:30', '7:30 PM']];
-    var ideas = ['Soccer', 'Playdate', 'Dentist', 'Dinner out', 'Swim', 'Birthday party'];
-    App.sheet(
-      '<div class="sheet-pad add">' +
-      '<div class="label">New event</div>' +
-      '<input class="big-input serif" placeholder="What’s happening?" data-f="title">' +
-      '<div class="chips">' + ideas.map(function (i) { return '<button class="chip chip--ghost" data-idea="' + i + '">' + i + '</button>'; }).join('') + '</div>' +
-      '<div class="label">Who</div><div class="add-who">' + D.people.map(function (p) {
-        return '<button class="who-btn" data-who="' + p.id + '" style="' + App.pstyle(p) + '">' + App.avatar(p, 56) + '<span>' + p.name + '</span></button>';
-      }).join('') + '<button class="who-btn" data-who="all" style="' + App.pstyle(D.family) + '">' + App.avatar(D.family, 56) + '<span>Everyone</span></button></div>' +
-      '<div class="add-row"><div><div class="label">When</div><div class="chips">' + days.map(function (i) {
-        var d = App.addDays(now, i);
-        return '<button class="chip' + (i === 0 ? ' is-on' : '') + '" data-dayi="' + i + '">' + (i < 2 ? App.fmt.rel(d) : App.fmt.dayShort(d) + ' ' + d.getDate()) + '</button>';
-      }).join('') + '</div></div></div>' +
-      '<div class="add-row"><div><div class="label">Time</div><div class="chips">' + times.map(function (t) {
-        return '<button class="chip' + (t[0] === st.time ? ' is-on' : '') + '" data-time="' + t[0] + '">' + t[1] + '</button>';
-      }).join('') + '</div></div>' +
-      '<div><div class="label">Length</div><div class="chips">' + [[30, '30m'], [60, '1h'], [120, '2h']].map(function (t) {
-        return '<button class="chip' + (t[0] === st.dur ? ' is-on' : '') + '" data-dur="' + t[0] + '">' + t[1] + '</button>';
-      }).join('') + '</div></div></div>' +
-      '<div class="sheet-actions"><button class="btn btn--ghost" data-close>Cancel</button><button class="btn btn--solid" data-save>Add to calendar</button></div>' +
-      '</div>', {
-      cls: 'sheet--wide',
-      onMount: function (s, close) {
-        var input = s.querySelector('[data-f=title]');
-        s.addEventListener('click', function (ev) {
-          var t = ev.target.closest('button');
-          if (!t) return;
-          if (t.dataset.idea) { input.value = t.dataset.idea; }
-          if (t.dataset.who) {
-            if (t.dataset.who === 'all') st.who = st.who.length === 4 ? [] : D.ALL.slice();
-            else { var i = st.who.indexOf(t.dataset.who); if (i > -1) st.who.splice(i, 1); else st.who.push(t.dataset.who); }
-            App.$$('[data-who]', s).forEach(function (b) {
-              b.classList.toggle('is-on', b.dataset.who === 'all' ? st.who.length === 4 : st.who.indexOf(b.dataset.who) > -1);
-            });
-          }
-          ['dayi', 'time', 'dur'].forEach(function (k) {
-            if (t.dataset[k] != null) {
-              App.$$('[data-' + k + ']', s).forEach(function (b) { b.classList.toggle('is-on', b === t); });
-              if (k === 'dayi') st.day = +t.dataset.dayi; else if (k === 'dur') st.dur = +t.dataset.dur; else st.time = t.dataset.time;
-            }
-          });
-          if (t.hasAttribute('data-save')) {
-            var title = input.value.trim() || 'New event';
-            var who = st.who.length ? st.who.slice() : ['nadine'];
-            var start = App.addDays(App.dayStart(now), st.day), p = st.time.split(':');
-            start.setHours(+p[0], +p[1]);
-            var e = { id: D._eid(), title: title, people: who, start: start, end: new Date(+start + st.dur * 60000) };
-            D.events.push(e);
-            close();
-            V.date = App.dayStart(start); V.mode = V.mode === 'month' ? 'day' : V.mode; V.scroll = null;
-            render();
-            App.emit('data');
-            App.toast('Added <b>' + App.esc(title) + '</b> · ' + App.fmt.rel(start) + ' ' + App.fmt.time(start), {
-              icon: 'calendar', undo: function () { D.events.splice(D.events.indexOf(e), 1); render(); App.emit('data'); }
-            });
-          }
-        });
-      }
     });
   }
 

@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { googleCalendar } from './server/google-calendar.js';
 import { bomObservations } from './server/bom.js';
 
 // The wall tablet runs Android WebView 106 — keep JS output within Chromium 106.
@@ -6,11 +7,11 @@ import { bomObservations } from './server/bom.js';
 // #ffffffbf) even though Chrome 106 should support them, and a newer target lets the minifier
 // rewrite transparent/rgba() into that form. Verified on-device with CSS.supports().
 export default defineConfig({
-  plugins: [bomObservations()],
+  plugins: [bomObservations(), googleCalendar()],
   build: {
     target: 'chrome106',
     cssTarget: 'chrome61',
   },
-  server: { host: '127.0.0.1' },
+  server: { host: '127.0.0.1', fs: { deny: ['**/.private/**', '**/.env*', '**/*.{crt,pem}', '**/.git/**'] } },
   preview: { host: '127.0.0.1' },
 });

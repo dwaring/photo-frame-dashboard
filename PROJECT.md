@@ -5,6 +5,8 @@
 Mac browser prototype based on wesbos/photo-frame-dashboard at 033b5ac.
 Adelaide current weather uses BoM West Terrace / ngayirdapira station 94648
 (023000). Open-Meteo supplies the separately labelled hourly/daily forecasts.
+Google Calendar has a local read-only OAuth connection and shared-calendar picker;
+it is not connected until a client is configured, consent granted, and a calendar selected.
 Other channels still display upstream sample data and are not connected.
 Initial channels: Google Calendar, Adelaide weather, Spotify, Trello, photos.
 GitHub owner: dwaring. Fork: https://github.com/dwaring/photo-frame-dashboard
@@ -30,9 +32,10 @@ use; all public assets would be included by a future deployment.
 
 ## Implementation roadmap
 
-1. Add a local backend with OAuth callbacks and an ignored credential store.
-2. Google Calendar: choose calendars, read-only OAuth, normalize timed/all-day
-   events and timezones, show sync status and stale-data state.
+1. Local OAuth callbacks and ignored server credential storage implemented for Google Calendar.
+2. Google Calendar: read-only connection, calendar selection, timed/all-day events,
+   recurring expansion, and sync/stale status implemented. Complete local Google setup
+   using docs/google-calendar.md and verify against the household calendar.
 3. Weather: BoM measured observations via fixed /api/weather/observations route
    in the local Vite dev/preview server; separately labelled Open-Meteo forecasts.
    Static-only hosting does not provide the BoM route. Restart the local server

@@ -32,7 +32,7 @@ export function normalizeObservation(data) {
   const t = row.aifstime_utc;
   const observedAt = Date.parse(`${t.slice(0,4)}-${t.slice(4,6)}-${t.slice(6,8)}T${t.slice(8,10)}:${t.slice(10,12)}:${t.slice(12,14)}Z`);
   if (!Number.isFinite(observedAt) || observedAt > Date.now() + 5 * 60000) throw new Error('Invalid observation time');
-  const label = row.weather && row.weather !== '-' ? row.weather : row.cloud && row.cloud !== '-' ? row.cloud : 'Station observation';
+  const label = row.weather && row.weather !== '-' ? row.weather : row.cloud && row.cloud !== '-' ? row.cloud : '';
   return { observedAt, station: 'BoM West Terrace / ngayirdapira',
     current: { temp: row.air_temp, label, cond: /rain|shower|storm/i.test(label) ? 'rain' : 'thermo' },
     feels: Number.isFinite(row.apparent_t) ? row.apparent_t : null,
@@ -49,7 +49,7 @@ App.weatherNow = function () {
   if (!w.current) return { temp: '—', cond: 'cloud', summary: w.status === 'loading' ? 'Loading Adelaide weather…' : 'Weather unavailable', status: w.status };
   const stale = w.status !== 'live' || !usable(w) || Date.now() - w.fetchedAt > 2 * INTERVAL;
   return { ...w.current, hi: w.forecastAt && date(w.forecastAt) === date(Date.now()) ? w.hi : '—', lo: w.forecastAt && date(w.forecastAt) === date(Date.now()) ? w.lo : '—',
-    summary: w.current.label + (stale ? ' · Stale weather' : ''),
+    summary: [w.current.label, stale ? 'Stale weather' : ''].filter(Boolean).join(' · '),
     advice: [w.feels !== null ? 'Feels like ' + w.feels + '°C' : '', w.wind !== null ? 'Wind ' + w.wind + ' km/h' : ''].filter(Boolean).join(' · '),
     status: (stale ? 'Stale · ' : '') + 'Observed ' + clock(w.observedAt) + ' Adelaide time'
   };

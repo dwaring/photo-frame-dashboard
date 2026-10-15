@@ -4,6 +4,7 @@ import './data.js';
 import './personal-config.js';
 import './app.js';
 import './weather.js';
+import './google-calendar.js';
 import './system.js';
 import './slideshow.js';
 import './views/home.js';

@@ -1,23 +1,6 @@
-// Mock data for the prototype. Everything is relative to "today" so the demo always looks current.
+// Household display settings and sample data for channels not yet connected.
+// Calendar events start empty and are populated by Google Calendar.
 window.DATA = (function () {
-  var base = new Date();
-  base.setHours(0, 0, 0, 0);
-
-  function at(d, hm) {
-    var p = hm.split(':');
-    var x = new Date(base);
-    x.setDate(x.getDate() + d);
-    x.setHours(+p[0], +p[1], 0, 0);
-    return x;
-  }
-  var n = 0;
-  function ev(d, s, e, title, people, extra) {
-    return Object.assign({ id: 'e' + (++n), start: at(d, s), end: at(d, e), title: title, people: people }, extra || {});
-  }
-  function allDay(d, days, title, people, extra) {
-    return Object.assign({ id: 'e' + (++n), allDay: true, start: at(d, '00:00'), end: at(d + days, '00:00'), title: title, people: people }, extra || {});
-  }
-
   var ALL = ['darren', 'nadine', 'harvey', 'frankie'];
 
   var people = [
@@ -28,83 +11,8 @@ window.DATA = (function () {
   ];
   var family = { id: 'family', name: 'Family', color: '#111111', rgb: '17 17 17', ink: '#FFFFFF' };
 
-  // ---------------------------------------------------------------- calendar
-  var events = [
-    // Today
-    allDay(0, 1, 'Pajama Day at school', ['frankie']),
-    allDay(0, 1, 'Garbage + recycling night', ALL),
-    ev(0, '07:00', '07:45', 'Gym', ['nadine'], { loc: 'Iron Works' }),
-    ev(0, '08:15', '08:40', 'School drop-off', ['darren'], { travel: 10, loc: 'Parkdale Elementary' }),
-    ev(0, '09:30', '10:30', 'Design review', ['nadine'], { loc: 'Office · Room 4B' }),
-    ev(0, '12:00', '12:45', 'Dentist', ['harvey', 'nadine'], { travel: 15, loc: 'Bright Smiles Dental' }),
-    ev(0, '13:00', '14:00', 'Lunch with Sam', ['darren'], { loc: 'Café Rustica' }),
-    ev(0, '15:45', '16:30', 'Piano lesson', ['frankie'], { travel: 12, loc: "Ms. Park's Studio", notes: 'Bring the blue theory book.' }),
-    ev(0, '16:05', '16:30', 'Drive Buzzsaw to soccer', ['nadine']),
-    ev(0, '16:25', '16:50', 'Pick up Skidmark', ['nadine'], { loc: "Ms. Park's Studio" }),
-    ev(0, '16:30', '18:00', 'Soccer practice', ['harvey'], { travel: 20, loc: 'Lakeshore Fields', notes: 'Shin guards + water bottle. Rain likely — pack a jacket.' }),
-    ev(0, '17:00', '17:30', 'Parent–teacher call', ['darren', 'nadine'], { loc: 'Zoom' }),
-    ev(0, '18:30', '19:30', "Dinner at Nonna's", ALL, { travel: 20, loc: "Nonna's", notes: 'Bring the lemon cake.' }),
-    ev(0, '20:00', '20:30', 'Bath + books', ['frankie']),
-
-    // Tomorrow → +6
-    allDay(1, 3, 'Wes in Montréal', ['darren'], { loc: 'Hotel William Gray' }),
-    ev(1, '07:00', '07:45', 'Gym', ['nadine'], { loc: 'Iron Works' }),
-    ev(1, '08:15', '08:40', 'School drop-off', ['nadine'], { travel: 10 }),
-    ev(1, '10:30', '11:15', 'Vet — Biscuit', ['nadine'], { travel: 10, loc: 'Riverdale Animal Clinic' }),
-    ev(1, '15:30', '16:30', 'Art club', ['harvey'], { loc: 'School' }),
-    ev(1, '16:00', '18:00', 'Playdate with Leo', ['frankie'], { travel: 8, loc: "Leo's house" }),
-    ev(1, '19:00', '21:00', 'Book club', ['nadine'], { travel: 10, loc: "Priya's" }),
-
-    ev(2, '09:00', '14:00', 'Science Centre trip', ['frankie'], { loc: 'Ontario Science Centre' }),
-    ev(2, '13:00', '13:45', 'Haircuts', ['harvey', 'frankie'], { travel: 10, loc: 'Snip Snip Kids' }),
-    ev(2, '16:30', '18:00', 'Soccer practice', ['harvey'], { travel: 20, loc: 'Lakeshore Fields' }),
-    ev(2, '18:00', '19:30', 'Pizza night', ALL),
-
-    ev(3, '10:00', '10:45', 'Swim lessons', ['frankie'], { travel: 12, loc: 'Wellesley Pool' }),
-    ev(3, '11:00', '12:00', 'Grocery run', ['nadine']),
-    ev(3, '13:00', '15:30', "Zoe's birthday party", ['harvey'], { travel: 15, loc: 'Pottery Place' }),
-    ev(3, '19:00', '21:00', 'Movie night', ALL),
-
-    ev(4, '10:30', '12:00', 'Sunday brunch', ALL, { travel: 15, loc: 'Lady Marmalade' }),
-    ev(4, '17:05', '18:20', 'Flight home · AC 418', ['darren'], { loc: 'YUL → YYZ' }),
-
-    ev(5, '07:00', '07:45', 'Gym', ['nadine']),
-    ev(5, '15:45', '16:30', 'Piano lesson', ['frankie'], { travel: 12 }),
-    ev(5, '16:30', '18:00', 'Soccer practice', ['harvey'], { travel: 20 }),
-    ev(5, '19:00', '20:00', 'Yoga', ['nadine']),
-
-    allDay(6, 2, 'Grandma visits', ALL),
-    ev(6, '09:00', '09:45', 'Dentist', ['frankie'], { travel: 15, loc: 'Bright Smiles Dental' }),
-    ev(6, '16:30', '18:00', 'Soccer practice', ['harvey'], { travel: 20 })
-  ];
-
-  // Background recurring events so the month view has texture
-  for (var d = -40; d <= 45; d++) {
-    if (d >= 0 && d <= 6) continue;
-    var dow = new Date(at(d, '00:00')).getDay();
-    if (dow === 1) events.push(ev(d, '15:45', '16:30', 'Piano lesson', ['frankie']));
-    if (dow === 2 || dow === 4) events.push(ev(d, '16:30', '18:00', 'Soccer practice', ['harvey']));
-    if (dow === 3) events.push(ev(d, '19:00', '20:00', 'Yoga', ['nadine']));
-    if (dow === 6) events.push(ev(d, '10:00', '10:45', 'Swim lessons', ['frankie']));
-    if (dow === 0) events.push(ev(d, '17:30', '19:30', "Dinner at Nonna's", ALL));
-    if (dow === 5 && d % 2 === 0) events.push(ev(d, '18:00', '19:30', 'Pizza night', ALL));
-    if (d % 9 === 0) events.push(ev(d, '12:00', '13:00', 'Lunch meeting', ['darren']));
-    if (d % 11 === 0) events.push(ev(d, '09:00', '10:00', 'Doctor', ['nadine']));
-  }
-  events.push(allDay(12, 1, "Buzzsaw's birthday 🎂", ALL));
-  events.push(allDay(-8, 3, 'Cottage weekend', ALL));
-
-  // Extra events for the "overloaded day" demo
-  var busyExtras = [
-    ev(0, '10:00', '11:00', 'Plumber window', ['nadine']),
-    ev(0, '11:00', '11:30', 'Call with bank', ['darren']),
-    ev(0, '14:30', '15:30', 'Library volunteer', ['nadine']),
-    ev(0, '15:30', '16:00', 'Snack prep', ['harvey']),
-    ev(0, '16:00', '16:45', 'Math tutor', ['frankie']),
-    ev(0, '16:15', '17:00', 'Swim make-up', ['frankie'], { travel: 10 }),
-    ev(0, '19:45', '20:30', 'Bake sale prep', ['harvey', 'nadine']),
-    ev(0, '20:30', '21:30', 'Hockey', ['darren'], { travel: 15 })
-  ];
+  // Populated only by the connected Google Calendar integration.
+  var events = [];
 
   // ---------------------------------------------------------------- chores
   var routines = [
@@ -261,7 +169,7 @@ window.DATA = (function () {
   var weather = { location: 'Adelaide, AU', status: 'loading', hourly: [] };
 
   // ---------------------------------------------------------------- photos
-  var t = new Date(base);
+  var t = new Date();
   var mmdd = ('0' + (t.getMonth() + 1)).slice(-2) + '-' + ('0' + t.getDate()).slice(-2);
   var photos = [
     { seed: 'tofino-surf', o: 'l', date: '2021-' + mmdd, place: 'Tofino, BC', from: 'nadine', tag: 'tofino' },
@@ -334,12 +242,11 @@ window.DATA = (function () {
 
   return {
     people: people, family: family, ALL: ALL,
-    events: events, busyExtras: busyExtras,
+    events: events,
     routines: routines, chores: chores, stars: stars, week: week,
     stores: stores, catOrder: catOrder, groceries: groceries, catalog: catalog, usuals: usuals,
     rooms: rooms, devices: devices, climate: climate, media: media, cameras: cameras, scenes: scenes,
     weather: weather, photos: photos, agents: agents,
-    _gid: function () { return 'g' + (++gid); },
-    _eid: function () { return 'e' + (++n); }
+    _gid: function () { return 'g' + (++gid); }
   };
 })();

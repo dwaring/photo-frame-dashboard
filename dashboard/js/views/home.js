@@ -18,7 +18,7 @@
       '<span class="h-wx-temp num">' + w.temp + '°</span>' +
       '<span class="h-wx-meta"><b>' + App.esc(w.label) + '</b>' + ('<span>Forecast H ' + w.hi + '°  L ' + w.lo + '°</span>') + '</span>' +
       '</div>' +
-      '<div class="h-wx-say"><b>' + App.esc(w.summary) + '.</b> ' + App.esc(w.advice) + '.</div>' +
+      '<div class="h-wx-say">' + (w.summary ? '<b>' + App.esc(w.summary) + '.</b> ' : '') + App.esc(w.advice) + '.</div>' +
       (hours.length ? '' : '<small>Hourly forecast unavailable</small>') +
       '<div class="h-wx-hours">' + hours.map(function (h) {
         return '<div class="h-hr' + (h.p >= 50 ? ' is-wet' : '') + '"><span class="h-hr-l">' + h.label + '</span>' +
@@ -71,14 +71,16 @@
   function lanes() {
     var now = App.now();
     return D.people.map(function (p) {
-      var list = App.timedOn(now, p.id).filter(function (e) { return e.end > now; });
+      var list = App.allDayOn(now, p.id).concat(
+        App.timedOn(now, p.id).filter(function (e) { return e.end > now; })
+      );
       var shown = list.slice(0, 3), more = list.length - shown.length;
       return '<div class="h-lane" style="' + App.pstyle(p) + '">' +
         '<div class="h-lane-head">' + App.avatar(p, 30) + '<b>' + p.name + '</b></div>' +
         (list.length ? shown.map(function (e) {
-          var cur = e.start <= now;
+          var cur = !e.allDay && e.start <= now;
           return '<button class="h-ev' + (cur ? ' is-now' : '') + '" data-ev="' + e.id + '">' +
-            '<span class="h-ev-t">' + (cur ? 'Now' : App.fmt.time(e.start, false)) + '</span>' +
+            '<span class="h-ev-t">' + (e.allDay ? 'All day' : (cur ? 'Now' : App.fmt.time(e.start, false))) + '</span>' +
             '<span class="h-ev-n">' + App.esc(e.title) + '</span></button>';
         }).join('') : '<div class="h-free serif"><i>Free</i> the rest of the day</div>') +
         (more > 0 ? '<button class="h-more" data-go="calendar">+' + more + ' more</button>' : '') +
