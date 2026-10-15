@@ -18,7 +18,7 @@ Open http://127.0.0.1:5173/. Run `npm run build` before committing changes.
 
 Copy dashboard/config/example.json to dashboard/config/local.json for local
 display preferences. Keys in peopleNames are the existing demo person IDs
-alex, jordan, maya, otto. Other channel entries record configuration intent only; enabled flags do not
+darren, nadine, harvey, frankie. Other channel entries record configuration intent only; enabled flags do not
 yet connect those services. Weather is fixed to Adelaide (Australia/Adelaide),
 refreshes every 10 minutes, and uses a browser cache with explicit stale/error
 labels. No weather API key is required. Browser time uses the Mac timezone.
