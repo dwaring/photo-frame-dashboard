@@ -1,0 +1,8 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "home-dashboard",
+  "main": "worker/setup.js",
+  "compatibility_date": "2026-09-30",
+  "workers_dev": true,
+  "preview_urls": false
+}

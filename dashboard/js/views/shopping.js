@@ -24,7 +24,7 @@
       '<button class="s-hit" data-check="' + g.id + '">' +
       '<span class="s-box">' + App.icon('check', 22) + '</span>' +
       '<span class="s-name"><b>' + App.esc(g.name) + '</b>' + (g.note ? '<small>' + App.esc(g.note) + '</small>' : '') + '</span>' +
-      (V.store === 'all' && g.store === 'costco' ? '<span class="s-store">Costco</span>' : '') +
+      (V.store === 'all' && g.store === 'amazon' ? '<span class="s-store">Amazon</span>' : '') +
       '</button>' +
       '<div class="s-qty"><button data-qty="-1" data-id="' + g.id + '" aria-label="Less">' + App.icon('minus', 22) + '</button><span class="num">' + g.qty + '</span><button data-qty="1" data-id="' + g.id + '" aria-label="More">' + App.icon('plus', 22) + '</button></div>' +
       '</div>';

@@ -1,8 +1,12 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "home-dashboard",
+  "main": "worker/index.js",
   "compatibility_date": "2026-09-30",
+  "preview_urls": false,
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
   }
 }

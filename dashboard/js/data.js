@@ -66,11 +66,11 @@ window.DATA = (function () {
   var week = { harvey: [1, 1, 0, 1, 1, 0, 1], frankie: [1, 0, 1, 1, 1, 1, 0] };
 
   // ---------------------------------------------------------------- shopping
-  var stores = [{ id: 'grocer', name: 'FreshCo' }, { id: 'costco', name: 'Costco' }];
+  var stores = [{ id: 'grocer', name: 'Woolworths' }, { id: 'amazon', name: 'Amazon' }];
   var catOrder = {
     all: ['Produce', 'Bakery', 'Meat & Fish', 'Dairy & Eggs', 'Pantry', 'Frozen', 'Snacks', 'Household'],
     grocer: ['Produce', 'Bakery', 'Meat & Fish', 'Dairy & Eggs', 'Pantry', 'Frozen', 'Snacks', 'Household'],
-    costco: ['Household', 'Pantry', 'Snacks', 'Dairy & Eggs', 'Meat & Fish', 'Frozen', 'Produce', 'Bakery']
+    amazon: ['Household', 'Pantry', 'Snacks', 'Dairy & Eggs', 'Meat & Fish', 'Frozen', 'Produce', 'Bakery']
   };
   var gid = 0;
   function g(name, cat, qty, store, done, note) {
@@ -82,21 +82,21 @@ window.DATA = (function () {
     g('Avocados', 'Produce', 3, 'grocer'),
     g('Honeycrisp apples', 'Produce', 6, 'grocer'),
     g('Sourdough loaf', 'Bakery', 1, 'grocer'),
-    g('Bagels', 'Bakery', 2, 'costco', false, 'Everything'),
+    g('Bagels', 'Bakery', 2, 'grocer', false, 'Everything'),
     g('Chicken thighs', 'Meat & Fish', 1, 'grocer', false, 'Boneless'),
     g('Salmon fillets', 'Meat & Fish', 2, 'grocer'),
-    g('Milk 2%', 'Dairy & Eggs', 2, 'costco'),
-    g('Eggs', 'Dairy & Eggs', 1, 'costco', false, '2 dozen'),
+    g('Milk 2%', 'Dairy & Eggs', 2, 'grocer'),
+    g('Eggs', 'Dairy & Eggs', 1, 'grocer', false, '2 dozen'),
     g('Greek yogurt', 'Dairy & Eggs', 1, 'grocer'),
     g('Aged cheddar', 'Dairy & Eggs', 1, 'grocer'),
     g('Rigatoni', 'Pantry', 2, 'grocer'),
-    g('Olive oil', 'Pantry', 1, 'costco'),
+    g('Olive oil', 'Pantry', 1, 'grocer'),
     g('Coffee beans', 'Pantry', 1, 'grocer', false, 'Dark roast'),
     g('Frozen peas', 'Frozen', 1, 'grocer'),
     g('Waffles', 'Frozen', 1, 'grocer'),
-    g('Goldfish crackers', 'Snacks', 1, 'costco'),
+    g('Goldfish crackers', 'Snacks', 1, 'grocer'),
     g('Granola bars', 'Snacks', 1, 'grocer'),
-    g('Paper towels', 'Household', 1, 'costco'),
+    g('Paper towels', 'Household', 1, 'amazon'),
     g('Dish soap', 'Household', 1, 'grocer'),
     g('Lemons', 'Produce', 2, 'grocer', true),
     g('Butter', 'Dairy & Eggs', 1, 'grocer', true),
