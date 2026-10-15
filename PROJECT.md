@@ -3,7 +3,9 @@
 ## Current state
 
 Mac browser prototype based on wesbos/photo-frame-dashboard at 033b5ac.
-The UI still displays upstream sample data. No personal service is connected yet.
+Adelaide current weather uses BoM West Terrace / ngayirdapira station 94648
+(023000). Open-Meteo supplies the separately labelled hourly/daily forecasts.
+Other channels still display upstream sample data and are not connected.
 Initial channels: Google Calendar, Adelaide weather, Spotify, Trello, photos.
 GitHub owner: dwaring. Fork: https://github.com/dwaring/photo-frame-dashboard
 Personal starting branch: personal-dashboard. Main tracks the upstream baseline.
@@ -16,8 +18,10 @@ Open http://127.0.0.1:5173/. Run `npm run build` before committing changes.
 
 Copy dashboard/config/example.json to dashboard/config/local.json for local
 display preferences. Keys in peopleNames are the existing demo person IDs
-alex, jordan, maya, otto. Channel entries record configuration intent only;
-enabled flags do not yet connect services. Browser time uses the Mac timezone.
+alex, jordan, maya, otto. Other channel entries record configuration intent only; enabled flags do not
+yet connect those services. Weather is fixed to Adelaide (Australia/Adelaide),
+refreshes every 10 minutes, and uses a browser cache with explicit stale/error
+labels. No weather API key is required. Browser time uses the Mac timezone.
 
 Never put passwords, OAuth secrets, tokens, or private calendar URLs in browser
 config. Anything imported by Vite is delivered to the browser, even when ignored
@@ -29,8 +33,10 @@ use; all public assets would be included by a future deployment.
 1. Add a local backend with OAuth callbacks and an ignored credential store.
 2. Google Calendar: choose calendars, read-only OAuth, normalize timed/all-day
    events and timezones, show sync status and stale-data state.
-3. Weather: Adelaide, Australia/Adelaide; implement current/hourly forecast with
-   caching and explicit failure state. Replace demo weather only after validation.
+3. Weather: BoM measured observations via fixed /api/weather/observations route
+   in the local Vite dev/preview server; separately labelled Open-Meteo forecasts.
+   Static-only hosting does not provide the BoM route. Restart the local server
+   after changing Vite configuration. No model fallback for station observations.
 4. Trello: select boards/lists and import cards read-only first; agree on mapping
    to chores and shopping before enabling writes.
 5. Spotify: connect account and show playback; add playback controls only after

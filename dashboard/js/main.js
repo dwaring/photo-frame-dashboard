@@ -3,6 +3,7 @@ import './icons.js';
 import './data.js';
 import './personal-config.js';
 import './app.js';
+import './weather.js';
 import './system.js';
 import './slideshow.js';
 import './views/home.js';

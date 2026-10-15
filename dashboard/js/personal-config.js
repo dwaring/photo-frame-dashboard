@@ -4,6 +4,7 @@ const local = import.meta.glob('../config/local.json', { eager: true, import: 'd
 const config = Object.values(local)[0] || defaults;
 document.title = config.title || defaults.title;
 window.DASHBOARD_CONFIG = config;
+window.DATA.weather.location = config.channels?.weather?.location || defaults.channels.weather.location;
 const renamedPeople = window.DATA.people
   .filter(person => config.peopleNames?.[person.id])
   .map(person => [person.name, config.peopleNames[person.id]]);
