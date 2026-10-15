@@ -2,15 +2,42 @@
 
 ## Current state
 
-Mac browser prototype based on wesbos/photo-frame-dashboard at 033b5ac.
+Web dashboard prototype based on wesbos/photo-frame-dashboard at 033b5ac,
+currently developed and tested on a Mac. The deployment target is an Android
+tablet running independently in kiosk mode, without an always-on Mac or home
+server. Android kiosk deployment is not yet verified.
 Adelaide current weather uses BoM West Terrace / ngayirdapira station 94648
 (023000). Open-Meteo supplies the separately labelled hourly/daily forecasts.
 Google Calendar has a local read-only OAuth connection and shared-calendar picker;
 it is not connected until a client is configured, consent granted, and a calendar selected.
 Other channels still display upstream sample data and are not connected.
-Initial channels: Google Calendar, Adelaide weather, Spotify, Trello, photos.
+Initial channels: Google Calendar, Adelaide weather, shared shopping/groceries,
+Spotify, Trello, photos. Shopping currently uses in-memory demo data; it has
+no shared source or durable storage.
 GitHub owner: dwaring. Fork: https://github.com/dwaring/photo-frame-dashboard
 Personal starting branch: personal-dashboard. Main tracks the upstream baseline.
+
+## Deployment scope
+
+The tablet must operate without the development machine. Internet access is
+required for live shared-service sync; independent operation does not mean
+fully offline operation. Prefer a hosted web dashboard with a small authenticated
+hosted backend for service credentials, OAuth, and API routes. Hosting provider,
+authentication, and kiosk/browser setup remain to be selected.
+
+Current local Vite routes and Mac-side credential storage are development
+infrastructure, not a completed Android deployment. Calendar OAuth and the BoM
+proxy need a deployment-compatible backend. Do not put service secrets in the
+tablet's browser configuration or expose private data through public endpoints.
+Plan cached display with last-synced/stale status; offline editing and conflict
+handling are not implemented.
+
+For shared groceries, Todoist with a shared Groceries project and a hosted API
+adapter is the recommended direction, pending source selection by the user.
+Family members would manage the same list from their phones; the dashboard
+would display, add, and complete items. Apple Notes/Reminders via a Mac helper
+does not meet the requirement to operate without an always-on Mac. No shopping
+service has been selected, configured, or connected yet.
 
 ## Local development
 
@@ -23,7 +50,8 @@ display preferences. Keys in peopleNames are the existing demo person IDs
 darren, nadine, harvey, frankie. Other channel entries record configuration intent only; enabled flags do not
 yet connect those services. Weather is fixed to Adelaide (Australia/Adelaide),
 refreshes every 10 minutes, and uses a browser cache with explicit stale/error
-labels. No weather API key is required. Browser time uses the Mac timezone.
+labels. No weather API key is required. Browser time uses the device timezone
+(the Mac during development); verify the tablet's timezone during kiosk setup.
 
 Never put passwords, OAuth secrets, tokens, or private calendar URLs in browser
 config. Anything imported by Vite is delivered to the browser, even when ignored
@@ -40,14 +68,20 @@ use; all public assets would be included by a future deployment.
    in the local Vite dev/preview server; separately labelled Open-Meteo forecasts.
    Static-only hosting does not provide the BoM route. Restart the local server
    after changing Vite configuration. No model fallback for station observations.
-4. Trello: select boards/lists and import cards read-only first; agree on mapping
-   to chores and shopping before enabling writes.
+4. Shared shopping: confirm the source (Todoist recommended), then implement
+   authenticated hosted access, list selection, read sync, and add/complete
+   actions. Define store, quantity, notes, and category mappings. Replace demo
+   items only after connection succeeds; show disconnected/stale states clearly.
+   Trello: select boards/lists and import cards read-only first; agree on mapping
+   to chores before enabling writes.
 5. Spotify: connect account and show playback; add playback controls only after
    account/device capabilities are confirmed.
 6. Photos: choose local folder or cloud album source, then add indexing and
    original-photo rendering in place of seeded demo images.
-7. Add persistent storage for dashboard edits and backup/restore. Verify launch
-   after reboot. Decide hosting/authentication before exposing personal data.
+7. Choose hosting/authentication and move required local backend functions to
+   the hosted environment. Add persistent storage and backup/restore where
+   needed. Verify Android kiosk startup after reboot, touch layout, session
+   persistence, reconnect behavior, and cached display during outages.
 
 ## Upstream maintenance
 
@@ -58,4 +92,6 @@ merging; device flashing scripts are outside this project's scope.
 ## Pending decisions
 
 Calendar selections; Trello boards/lists; photo source; household names; whether
-Spotify is for now-playing or playback control. No production hosting yet.
+Spotify is for now-playing or playback control; shared shopping source and field
+mapping; hosting/authentication; Android kiosk/browser setup and offline policy.
+No production hosting yet. An always-on Mac/home server is not a deployment option.
