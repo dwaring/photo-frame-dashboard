@@ -22,8 +22,7 @@ once account access is available. Hosted verification remains pending. See docs/
 Coverage of all ChatGPT conversations is not verified. No sample usage is shown.
 Other channels still display upstream sample data and are not connected.
 Initial channels: Google Calendar, Adelaide weather, shared shopping/groceries,
-Spotify, Todoist, photos. Shopping currently uses in-memory demo data; it has
-no shared source or durable storage.
+Spotify, Todoist, photos. Shopping uses a deployed Todoist adapter with Worker secrets configured. A read-only live adapter check returned 3 active items on 2026-10-16. Live adapter checks verified usuals, add, quantity, duplicate prevention, complete, and add-back actions with a temporary item, removed afterwards. Authenticated hosted browser rendering remains to be verified. No sample groceries are displayed.
 GitHub owner: dwaring. Fork: https://github.com/dwaring/photo-frame-dashboard
 Personal starting branch: personal-dashboard. Main tracks the upstream baseline.
 
@@ -38,7 +37,7 @@ Wrangler authentication is verified. The home-dashboard Worker now serves the
 built dashboard and fixed weather API routes using dashboard/wrangler.jsonc.
 Cloudflare Access redirects unauthenticated requests to sign-in. Authorized
 browser rendering and live weather behavior still require user verification;
-kiosk/browser setup is pending. Todoist and hosted Google Calendar are not connected.
+kiosk/browser setup is pending. Todoist is deployed and configured; hosted Google Calendar is not connected.
 
 Current local Vite routes and Mac-side credential storage are development
 infrastructure, not a completed Android deployment. Calendar OAuth still needs a deployment-compatible backend. The BoM and
@@ -52,8 +51,7 @@ Todoist is the selected single source for groceries, recurring chores, and home
 projects. Trello is being superseded; its existing home board must be retained
 until migration is verified. The separate Trello groceries board was prepared
 but never connected to the dashboard. Woolworths and Amazon are the shopping
-stores. Todoist project structure, authorization, migration, and hosted API
-adapter are not implemented yet. Shopping still displays in-memory demo data.
+stores. The Shopping project has been identified. A hosted Todoist API adapter supports read sync, add, complete, quantity, and add-back actions. A separate Shopping usuals project supplies reusable quick-add tiles; the original shopping layout and store/category controls are restored. Worker secrets are installed and a live read succeeded; live adapter mutations have also passed; authenticated hosted UI verification remains pending. Trello migration is not verified. See docs/todoist.md.
 Apple Notes/Reminders via a Mac helper does not meet the independent-tablet
 requirement.
 
@@ -62,6 +60,9 @@ requirement.
 Use Node 22.12+ or a current supported LTS. In dashboard/ run `npm ci`, then
 `npm run dev -- --host 127.0.0.1 --port 5173 --strictPort`.
 Open http://127.0.0.1:5173/. Run `npm run build` before committing changes.
+Todoist also works locally using the ignored server-only `.private/todoist-token`
+and `.private/todoist.json` files; local edits update the live Todoist projects.
+See docs/todoist.md.
 
 Copy dashboard/config/example.json to dashboard/config/local.json for local
 display preferences. Keys in peopleNames are the existing demo person IDs
@@ -87,8 +88,8 @@ use; all public assets would be included by a future deployment.
    The hosted Worker also implements these fixed routes. Restart the local server
    after changing Vite configuration. No model fallback for station observations.
 4. Todoist: configure shared groceries, chores, and home projects; migrate and
-   verify existing Trello tasks before retiring their source. Implement hosted
-   authorization, read sync, and add/complete actions. Define store, quantity,
+   verify existing Trello tasks before retiring their source. Configure Worker secrets and verify the implemented hosted
+   read sync and add/complete actions. Define store, quantity,
    notes, categories, and recurring-task mappings. Distinguish demo, configured,
    connected, and stale states.
 5. Spotify: connect account and show playback; add playback controls only after
@@ -113,6 +114,5 @@ merging; device flashing scripts are outside this project's scope.
 Calendar selections; Todoist projects and Trello migration; photo source; household names; whether
 Spotify is for now-playing or playback control; shared shopping field
 mapping; hosted authentication; Android kiosk/browser setup and offline policy.
-Access-protected dashboard and weather routes deployed; hosted calendar and
-Todoist integrations remain pending.
+Access-protected dashboard, weather, and Todoist routes are deployed; hosted calendar remains pending.
 An always-on Mac/home server is not a deployment option.

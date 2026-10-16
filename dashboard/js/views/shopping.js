@@ -1,235 +1,89 @@
-// Shopping: categorized list (left) + quick-add with usuals (right).
+// Original shopping controls backed by Todoist; no local-only edits.
 (function () {
   'use strict';
-  var D = window.DATA;
-  var V = { el: null, store: 'all', query: '', drawer: false, pending: {}, flash: null };
-
-  function open() { return D.groceries.filter(function (g) { return !g.done && (V.store === 'all' || g.store === V.store); }); }
-  function done() { return D.groceries.filter(function (g) { return g.done && (V.store === 'all' || g.store === V.store); }); }
-  function storeName(id) { return D.stores.filter(function (s) { return s.id === id; })[0].name; }
-
-  function categorize(name) {
-    var n = name.toLowerCase();
-    var hit = D.catalog.filter(function (c) { return c[0].toLowerCase() === n; })[0] ||
-      D.catalog.filter(function (c) { var a = c[0].toLowerCase(); return a.indexOf(n) > -1 || n.indexOf(a) > -1; })[0] ||
-      D.catalog.filter(function (c) { return n.split(/\s+/).some(function (w) { return w.length > 3 && c[0].toLowerCase().indexOf(w) > -1; }); })[0];
-    return hit ? hit[1] : 'Other';
+  var el, draft = '', store = 'all', drawer = false, pending = {};
+  function category(t) {
+    var name = t.name.toLowerCase();
+    var hit = DATA.catalog.find(function (c) { return c[0].toLowerCase() === name; }) ||
+      DATA.catalog.find(function (c) { var n = c[0].toLowerCase(); return n.indexOf(name) !== -1 || name.indexOf(n) !== -1; });
+    return hit ? hit[1] : /\bbars\b/.test(name) ? 'Snacks' : 'Other';
   }
-  function find(name, isDone) {
-    return D.groceries.filter(function (g) { return !!g.done === isDone && g.name.toLowerCase() === name.toLowerCase(); })[0];
+  function visible(t) { return store === 'all' || t.store === store; }
+  function onList(t) {
+    return DATA.groceries.find(function (g) { return g.name.toLowerCase() === t.name.toLowerCase() && g.store === (store === 'all' ? t.store : store); });
   }
-
-  function row(g) {
-    return '<div class="s-row' + (V.pending[g.id] ? ' is-checking' : '') + '" data-id="' + g.id + '">' +
-      '<button class="s-hit" data-check="' + g.id + '">' +
-      '<span class="s-box">' + App.icon('check', 22) + '</span>' +
-      '<span class="s-name"><b>' + App.esc(g.name) + '</b>' + (g.note ? '<small>' + App.esc(g.note) + '</small>' : '') + '</span>' +
-      (V.store === 'all' && g.store === 'amazon' ? '<span class="s-store">Amazon</span>' : '') +
-      '</button>' +
-      '<div class="s-qty"><button data-qty="-1" data-id="' + g.id + '" aria-label="Less">' + App.icon('minus', 22) + '</button><span class="num">' + g.qty + '</span><button data-qty="1" data-id="' + g.id + '" aria-label="More">' + App.icon('plus', 22) + '</button></div>' +
-      '</div>';
+  function blocked() { return Shopping.state.busy || !Shopping.state.connected; }
+  function disabled(extra) { return blocked() || extra ? ' disabled' : ''; }
+  function suggestions() {
+    var s = Shopping.state, q = draft.trim().toLowerCase();
+    var staples = s.usuals.filter(function (t) { return !q || t.name.toLowerCase().indexOf(q) !== -1; });
+    return '<div class="label">' + (q ? 'Suggestions' : 'Usuals · tap to add') + '</div><div class="s-usuals">' + staples.map(function (t) {
+      var on = onList(t);
+      return '<button class="s-tile' + (on ? ' is-on' : '') + '" data-staple="' + App.esc(t.id) + '"' + disabled(!!on) + '><b>' + App.esc(t.name) + '</b><span>' + (on ? 'On list · ×' + on.qty : category(t)) + '</span></button>';
+    }).join('') + '</div>' + (!staples.length && !q ? '<p>' + (s.usualsConfigured ? 'Add reusable items to Shopping usuals in Todoist.' : 'The usuals project is not connected.') + '</p>' : '') +
+      (q ? '<button class="s-ac-row s-ac-row--new" data-add' + disabled() + '><b>Add “' + App.esc(draft.trim()) + '”</b>' + App.icon('plus', 26) + '</button>' : '');
   }
-
-  function listHTML() {
-    var items = open(), order = D.catOrder[V.store].concat(['Other']);
-    var groups = order.map(function (cat) { return { cat: cat, items: items.filter(function (g) { return g.cat === cat; }) }; }).filter(function (x) { return x.items.length; });
-    var d = done();
-    return (items.length ? groups.map(function (gr) {
-      return '<div class="s-cat" data-cat="' + gr.cat + '"><div class="s-cat-h"><span class="label">' + gr.cat + '</span><span class="label" data-cat-count>' + gr.items.length + '</span></div>' + gr.items.map(row).join('') + '</div>';
-    }).join('') : '<div class="s-empty serif">All stocked up.<br><i>Nothing left to buy.</i></div>') +
-      (d.length ? '<div class="s-drawer' + (V.drawer ? ' is-open' : '') + '">' +
-        '<button class="s-drawer-h" data-drawer><span>' + App.icon('check', 22) + ' Got it <b class="num">(' + d.length + ')</b></span><span class="label">' + (V.drawer ? 'Hide' : 'Show') + '</span></button>' +
-        (V.drawer ? '<div class="s-drawer-list">' + d.map(function (g) {
-          return '<button class="s-got" data-revive="' + g.id + '">' + App.esc(g.name) + '<span class="label">Add back</span></button>';
-        }).join('') + '<button class="btn btn--ghost s-clear" data-clear>Clear ' + d.length + ' checked items</button></div>' : '') +
-        '</div>' : '');
-  }
-
-  function suggestHTML() {
-    var q = V.query.trim().toLowerCase();
-    if (q) {
-      var matches = D.catalog.filter(function (c) { return c[0].toLowerCase().indexOf(q) === 0; })
-        .concat(D.catalog.filter(function (c) { var i = c[0].toLowerCase().indexOf(q); return i > 0; })).slice(0, 5);
-      var exact = matches.some(function (m) { return m[0].toLowerCase() === q; });
-      return '<div class="label">Suggestions</div><div class="s-ac">' + matches.map(function (m) {
-        var on = find(m[0], false);
-        return '<button class="s-ac-row" data-add="' + App.esc(m[0]) + '"><b>' + App.esc(m[0]) + '</b><span class="label">' + (on ? 'On list · ×' + on.qty : m[1]) + '</span>' + App.icon('plus', 26) + '</button>';
-      }).join('') + (exact ? '' : '<button class="s-ac-row s-ac-row--new" data-add="' + App.esc(V.query.trim()) + '"><b>Add “' + App.esc(V.query.trim()) + '”</b><span class="label">' + categorize(V.query) + '</span>' + App.icon('plus', 26) + '</button>') + '</div>';
-    }
-    return '<div class="label">Usuals · tap to add</div><div class="s-usuals">' + D.usuals.map(usualTile).join('') + '</div>';
-  }
-  function usualTile(name) {
-    var on = find(name, false);
-    return '<button class="s-tile' + (on ? ' is-on' : '') + '" data-add="' + App.esc(name) + '">' +
-      '<b>' + App.esc(name) + '</b><span>' + (on ? App.icon('check', 16) + 'On list' + (on.qty > 1 ? ' ×' + on.qty : '') : categorize(name)) + '</span></button>';
-  }
-
-  // ---- granular updates (full list + usuals rebuild costs ~500ms on the wall tablet)
-  function swap(old, html) {
-    var tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    old.parentNode.replaceChild(tmp.firstChild, old);
-  }
-  function refreshSuggestFor(g) {
-    if (V.query.trim()) return paintSuggest();
-    var t = V.el.querySelector('.s-usuals [data-add="' + App.esc(g.name) + '"]');
-    if (t) swap(t, usualTile(g.name));
-  }
-  function catCount(cat) {
-    var c = V.el.querySelector('.s-cat[data-cat="' + cat + '"]');
-    if (!c) return;
-    var n = c.querySelectorAll('.s-row').length;
-    if (!n) c.parentNode.removeChild(c);
-    else c.querySelector('[data-cat-count]').textContent = n;
-  }
-  function inView(g) { return !g.done && (V.store === 'all' || g.store === V.store); }
-  function insertRow(g) {
-    var cat = V.el.querySelector('.s-cat[data-cat="' + g.cat + '"]');
-    if (!inView(g)) return paintHead();
-    if (!cat) return paintList();
-    var tmp = document.createElement('div');
-    tmp.innerHTML = row(g);
-    cat.appendChild(tmp.firstChild);
-    catCount(g.cat);
-    paintHead();
-  }
-  function removeRow(g) {
-    var r = V.el.querySelector('.s-list [data-id="' + g.id + '"]');
-    var drawer = V.el.querySelector('.s-drawer');
-    if (!r || !drawer || V.drawer || !open().length) return paintList();
-    r.parentNode.removeChild(r);
-    catCount(g.cat);
-    drawer.querySelector('.num').textContent = '(' + done().length + ')';
-    paintHead();
-  }
-  function flash(g) {
-    var r = V.el.querySelector('.s-list [data-id="' + g.id + '"]');
-    if (!r) return;
-    r.classList.add('is-flash');
-    if (r.scrollIntoView) r.scrollIntoView({ block: 'nearest' });
-    setTimeout(function () { r.classList.remove('is-flash'); }, 1200);
-  }
-
-  function paintList() { var l = V.el.querySelector('.s-list'); var st = l.scrollTop; l.innerHTML = listHTML(); l.scrollTop = st; paintHead(); }
-  function paintSuggest() { V.el.querySelector('.s-suggest').innerHTML = suggestHTML(); }
-  function paintHead() {
-    var all = D.groceries.filter(function (g) { return !g.done; });
-    V.el.querySelector('.s-count').innerHTML = '<span class="num">' + open().length + '</span> to get';
-    V.el.querySelector('.s-stores').innerHTML = [['all', 'All']].concat(D.stores.map(function (s) { return [s.id, s.name]; })).map(function (s) {
-      var n = s[0] === 'all' ? all.length : all.filter(function (g) { return g.store === s[0]; }).length;
-      return '<button class="' + (V.store === s[0] ? 'is-on' : '') + '" data-store="' + s[0] + '">' + s[1] + ' <span class="num">' + n + '</span></button>';
-    }).join('');
+  function row(t) {
+    return '<div class="s-row' + (pending[t.id] ? ' is-checking' : '') + '"><button class="s-hit" data-check="' + App.esc(t.id) + '"' + disabled(t.uncompletable) + ' aria-label="Check off ' + App.esc(t.name) + '"><span class="s-box">' + App.icon('check', 22) + '</span><span class="s-name"><b>' + App.esc(t.name) + '</b>' + (t.note ? '<small>' + App.esc(t.note) + '</small>' : '') + '</span>' + (store === 'all' && t.store === 'amazon' ? '<span class="s-store">Amazon</span>' : '') + '</button>' +
+      '<div class="s-qty"><button data-qty="-1" data-id="' + App.esc(t.id) + '" aria-label="Less ' + App.esc(t.name) + '"' + disabled(t.uncompletable || pending[t.id] || t.qty <= 1) + '>' + App.icon('minus', 22) + '</button><span class="num">' + t.qty + '</span><button data-qty="1" data-id="' + App.esc(t.id) + '" aria-label="More ' + App.esc(t.name) + '"' + disabled(t.uncompletable || pending[t.id] || t.qty >= 999) + '>' + App.icon('plus', 22) + '</button></div></div>';
   }
   function render() {
-    V.el.innerHTML = '<div class="shop">' +
-      '<header class="s-head"><div><div class="label">Shared list</div><h1 class="serif">Groceries</h1></div><div class="s-count"></div><div class="seg s-stores"></div></header>' +
-      '<div class="s-list"></div>' +
-      '<aside class="s-side">' +
-      '  <div class="s-add">' +
-      '    <label class="s-input-wrap">' + App.icon('plus', 30) + '<input class="s-input" placeholder="Add an item…" autocomplete="off" enterkeyhint="done"></label>' +
-      '  </div>' +
-      '  <div class="s-suggest"></div>' +
-      '</aside></div>';
-    var input = V.el.querySelector('.s-input');
-    input.value = V.query;
-    input.addEventListener('input', function () { V.query = input.value; paintSuggest(); });
-    input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && input.value.trim()) { add(input.value); } });
-    paintList(); paintSuggest();
+    if (!el) return;
+    var focused = el.contains(document.activeElement) && document.activeElement.matches('.s-input');
+    var caret = focused ? document.activeElement.selectionStart : null;
+    var oldList = el.querySelector('.s-list'), scroll = oldList ? oldList.scrollTop : 0;
+    var s = Shopping.state, tasks = DATA.groceries.filter(visible), recent = s.recent.filter(visible);
+    var groups = DATA.catOrder[store].concat(['Other']).map(function (cat) {
+      var items = tasks.filter(function (t) { return category(t) === cat; });
+      return items.length ? '<div class="s-cat"><div class="s-cat-h"><span class="label">' + App.esc(cat) + '</span><span class="label">' + items.length + '</span></div>' + items.map(row).join('') + '</div>' : '';
+    }).join('');
+    el.innerHTML = '<div class="shop"><header class="s-head"><div><h1 class="serif">Groceries</h1></div><div class="s-count"><span class="num">' + tasks.length + '</span> to get</div><div class="seg s-stores">' + [['all', 'All']].concat(DATA.stores.map(function (t) { return [t.id, t.name]; })).map(function (t) {
+      return '<button data-store="' + t[0] + '" class="' + (store === t[0] ? 'is-on' : '') + '">' + t[1] + ' <span class="num">' + DATA.groceries.filter(function (g) { return t[0] === 'all' || g.store === t[0]; }).length + '</span></button>';
+    }).join('') + '</div></header><div class="s-list"><div class="s-sync"><span role="status">' + App.esc(s.message) + '</span><button class="btn btn--ghost" data-refresh' + (s.busy ? ' disabled' : '') + '>Refresh</button></div>' + groups + (!tasks.length && s.connected ? '<div class="s-empty serif">All stocked up.<br><i>Nothing left to buy.</i></div>' : '') +
+      (recent.length ? '<div class="s-drawer' + (drawer ? ' is-open' : '') + '"><button class="s-drawer-h" data-drawer><span>' + App.icon('check', 22) + ' Got it (' + recent.length + ')</span><span class="label">' + (drawer ? 'Hide' : 'Show') + '</span></button>' + (drawer ? '<div class="s-drawer-list"><p>Checked here during this session</p>' + recent.map(function (t) { return '<button class="s-got" data-revive="' + App.esc(t.id) + '"' + disabled() + '>' + App.esc(t.name) + '<span class="label">Add back</span></button>'; }).join('') + '<button class="btn btn--ghost" data-clear>Clear checked history</button></div>' : '') + '</div>' : '') +
+      '</div><aside class="s-side"><form class="s-add"><label class="s-input-wrap">' + App.icon('plus', 30) + '<input class="s-input" aria-label="New shopping item" placeholder="Add an item…" maxlength="500" autocomplete="off" enterkeyhint="done"' + disabled() + '></label></form><div class="s-suggest">' + suggestions() + '</div></aside></div>';
+    el.querySelector('.s-list').scrollTop = scroll;
+    var input = el.querySelector('input'); input.value = draft;
+    if (focused && !input.disabled) { input.focus(); input.setSelectionRange(caret, caret); }
+    input.addEventListener('input', function () { draft = input.value; el.querySelector('.s-suggest').innerHTML = suggestions(); });
+    el.querySelector('form').addEventListener('submit', function (e) { e.preventDefault(); add(); });
   }
-
-  function add(name) {
-    name = name.trim();
-    var g = find(name, false), msg;
-    if (g) {
-      g.qty++;
-      msg = 'Already on the list · now <b>×' + g.qty + '</b> ' + App.esc(g.name);
-      var q = V.el.querySelector('.s-list [data-id="' + g.id + '"] .s-qty .num');
-      if (q) q.textContent = g.qty;
-    } else if ((g = find(name, true))) {
-      g.done = false; g.qty = 1;
-      msg = 'Added back <b>' + App.esc(g.name) + '</b>';
-      paintList();
-    } else {
-      var cat = D.catalog.filter(function (c) { return c[0].toLowerCase() === name.toLowerCase(); })[0];
-      g = { id: D._gid(), name: cat ? cat[0] : name.charAt(0).toUpperCase() + name.slice(1), cat: categorize(name), qty: 1, store: V.store === 'all' ? 'grocer' : V.store, done: false, note: '' };
-      D.groceries.push(g);
-      msg = 'Added <b>' + App.esc(g.name) + '</b> to ' + g.cat;
-      insertRow(g);
-    }
-    var hadQuery = !!V.query.trim();
-    V.query = '';
-    var input = V.el.querySelector('.s-input');
-    if (input) input.value = '';
-    if (hadQuery) paintSuggest(); else refreshSuggestFor(g);
-    flash(g);
-    App.emit('data');
-    App.toast(msg, { icon: 'cart', ms: 3000 });
+  async function add(stapleId) {
+    if (blocked() || (!stapleId && !draft.trim())) return;
+    var body = { action: 'add' };
+    if (store !== 'all') body.store = store;
+    if (stapleId) body.stapleId = stapleId; else body.name = draft.trim();
+    if (await Shopping.change(body)) { draft = ''; render(); App.toast('Shopping list updated', { icon: 'cart', ms: 2500 }); }
   }
-
-  function check(g) {
-    V.pending[g.id] = true;
-    var rowEl = V.el.querySelector('[data-id="' + g.id + '"]');
-    rowEl.classList.add('is-checking');
-    setTimeout(function () {
-      if (!V.pending[g.id]) return;
-      delete V.pending[g.id];
-      g.done = true;
-      removeRow(g);
-      refreshSuggestFor(g);
-      App.emit('data');
-    }, 1200);
-    App.toast('<b>' + App.esc(g.name) + '</b> checked off', {
-      icon: 'check',
-      undo: function () {
-        var wasDone = g.done;
-        delete V.pending[g.id];
-        g.done = false;
-        if (wasDone) paintList();
-        else { var r = V.el.querySelector('.s-list [data-id="' + g.id + '"]'); if (r) r.classList.remove('is-checking'); }
-        refreshSuggestFor(g);
-        App.emit('data');
-      }
-    });
+  function check(task) {
+    if (pending[task.id]) { clearTimeout(pending[task.id]); delete pending[task.id]; return render(); }
+    pending[task.id] = setTimeout(async function () {
+      // Another write may be in flight: wait rather than lose the check-off.
+      while (Shopping.state.busy) await new Promise(function (resolve) { setTimeout(resolve, 100); });
+      if (!pending[task.id]) return;
+      delete pending[task.id];
+      await Shopping.change({ action: 'complete', id: task.id }); render();
+    }, 5000);
+    render();
+    App.toast('<b>' + App.esc(task.name) + '</b> checked off', { icon: 'check', ms: 5000, undo: function () { clearTimeout(pending[task.id]); delete pending[task.id]; render(); } });
   }
-
-  function onClick(e) {
-    var t;
-    if ((t = e.target.closest('[data-check]'))) {
-      var g = D.groceries.filter(function (x) { return x.id === t.dataset.check; })[0];
-      if (g && !V.pending[g.id]) check(g);
-      else if (g) { delete V.pending[g.id]; t.parentNode.classList.remove('is-checking'); }
-      return;
-    }
-    if ((t = e.target.closest('[data-qty]'))) {
-      var q = D.groceries.filter(function (x) { return x.id === t.dataset.id; })[0];
-      q.qty = Math.max(1, q.qty + +t.dataset.qty);
-      t.parentNode.querySelector('.num').textContent = q.qty;
-      refreshSuggestFor(q);
-      return;
-    }
-    if ((t = e.target.closest('[data-add]'))) return add(t.dataset.add);
-    if ((t = e.target.closest('[data-store]'))) { V.store = t.dataset.store; return paintList(); }
-    if ((t = e.target.closest('[data-drawer]'))) { V.drawer = !V.drawer; return paintList(); }
-    if ((t = e.target.closest('[data-revive]'))) {
-      var r = D.groceries.filter(function (x) { return x.id === t.dataset.revive; })[0];
-      r.done = false; paintList(); paintSuggest(); App.emit('data');
-      return App.toast('Added back <b>' + App.esc(r.name) + '</b>', { icon: 'cart', ms: 2500 });
-    }
-    if ((t = e.target.closest('[data-clear]'))) {
-      var gone = done();
-      D.groceries = D.groceries.filter(function (x) { return gone.indexOf(x) < 0; });
-      V.drawer = false;
-      paintList();
-      App.toast('Cleared ' + gone.length + ' items', {
-        icon: 'check', undo: function () { D.groceries = D.groceries.concat(gone); paintList(); }
+  App.on('shopping-updated', render);
+  App.register('shopping', { show: function (target) {
+    if (!el) {
+      el = target;
+      el.addEventListener('click', function (e) {
+        var t;
+        if ((t = e.target.closest('[data-store]'))) { store = t.dataset.store; return render(); }
+        if ((t = e.target.closest('[data-check]'))) { var task = DATA.groceries.find(function (g) { return g.id === t.dataset.check; }); if (task && !blocked()) check(task); return; }
+        if ((t = e.target.closest('[data-qty]'))) { var g = DATA.groceries.find(function (g) { return g.id === t.dataset.id; }); if (g) Shopping.change({ action: 'quantity', id: g.id, qty: g.qty + Number(t.dataset.qty) }); return; }
+        if ((t = e.target.closest('[data-staple]'))) return add(t.dataset.staple);
+        if (e.target.closest('[data-add]')) return add();
+        if (e.target.closest('[data-refresh]') && !Shopping.state.busy) return Shopping.sync();
+        if (e.target.closest('[data-drawer]')) { drawer = !drawer; return render(); }
+        if ((t = e.target.closest('[data-revive]'))) return Shopping.change({ action: 'reopen', id: t.dataset.revive });
+        if (e.target.closest('[data-clear]')) { Shopping.state.recent = []; render(); }
       });
     }
-  }
-
-  App.register('shopping', {
-    show: function (el) {
-      if (!V.el) { V.el = el; el.addEventListener('click', onClick); }
-      render();
-    }
-  });
+    render();
+  } });
 })();

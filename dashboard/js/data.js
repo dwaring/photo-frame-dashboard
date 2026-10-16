@@ -76,32 +76,7 @@ window.DATA = (function () {
   function g(name, cat, qty, store, done, note) {
     return { id: 'g' + (++gid), name: name, cat: cat, qty: qty, store: store, done: !!done, note: note || '' };
   }
-  var groceries = [
-    g('Bananas', 'Produce', 1, 'grocer', false, 'Bunch, not too ripe'),
-    g('Baby spinach', 'Produce', 1, 'grocer'),
-    g('Avocados', 'Produce', 3, 'grocer'),
-    g('Honeycrisp apples', 'Produce', 6, 'grocer'),
-    g('Sourdough loaf', 'Bakery', 1, 'grocer'),
-    g('Bagels', 'Bakery', 2, 'grocer', false, 'Everything'),
-    g('Chicken thighs', 'Meat & Fish', 1, 'grocer', false, 'Boneless'),
-    g('Salmon fillets', 'Meat & Fish', 2, 'grocer'),
-    g('Milk 2%', 'Dairy & Eggs', 2, 'grocer'),
-    g('Eggs', 'Dairy & Eggs', 1, 'grocer', false, '2 dozen'),
-    g('Greek yogurt', 'Dairy & Eggs', 1, 'grocer'),
-    g('Aged cheddar', 'Dairy & Eggs', 1, 'grocer'),
-    g('Rigatoni', 'Pantry', 2, 'grocer'),
-    g('Olive oil', 'Pantry', 1, 'grocer'),
-    g('Coffee beans', 'Pantry', 1, 'grocer', false, 'Dark roast'),
-    g('Frozen peas', 'Frozen', 1, 'grocer'),
-    g('Waffles', 'Frozen', 1, 'grocer'),
-    g('Goldfish crackers', 'Snacks', 1, 'grocer'),
-    g('Granola bars', 'Snacks', 1, 'grocer'),
-    g('Paper towels', 'Household', 1, 'amazon'),
-    g('Dish soap', 'Household', 1, 'grocer'),
-    g('Lemons', 'Produce', 2, 'grocer', true),
-    g('Butter', 'Dairy & Eggs', 1, 'grocer', true),
-    g('Tortillas', 'Bakery', 1, 'grocer', true)
-  ];
+  var groceries = [];
   var catalog = [
     ['Apples', 'Produce'], ['Avocados', 'Produce'], ['Bananas', 'Produce'], ['Baby spinach', 'Produce'], ['Blueberries', 'Produce'],
     ['Broccoli', 'Produce'], ['Carrots', 'Produce'], ['Cucumber', 'Produce'], ['Garlic', 'Produce'], ['Grapes', 'Produce'],
@@ -113,13 +88,14 @@ window.DATA = (function () {
     ['Greek yogurt', 'Dairy & Eggs'], ['Milk 2%', 'Dairy & Eggs'], ['Oat milk', 'Dairy & Eggs'], ['Parmesan', 'Dairy & Eggs'],
     ['Black beans', 'Pantry'], ['Cereal', 'Pantry'], ['Coffee beans', 'Pantry'], ['Flour', 'Pantry'], ['Honey', 'Pantry'],
     ['Maple syrup', 'Pantry'], ['Olive oil', 'Pantry'], ['Pasta sauce', 'Pantry'], ['Peanut butter', 'Pantry'], ['Rice', 'Pantry'],
-    ['Rigatoni', 'Pantry'], ['Spaghetti', 'Pantry'], ['Sugar', 'Pantry'], ['Tea', 'Pantry'], ['Frozen peas', 'Frozen'],
+    ['Spaghetti', 'Pantry'], ['Sugar', 'Pantry'], ['Tea', 'Pantry'], ['Frozen peas', 'Frozen'],
     ['Frozen berries', 'Frozen'], ['Ice cream', 'Frozen'], ['Pizza', 'Frozen'], ['Waffles', 'Frozen'], ['Chips', 'Snacks'],
     ['Crackers', 'Snacks'], ['Dark chocolate', 'Snacks'], ['Goldfish crackers', 'Snacks'], ['Granola bars', 'Snacks'],
     ['Popcorn', 'Snacks'], ['Dish soap', 'Household'], ['Dishwasher pods', 'Household'], ['Garbage bags', 'Household'],
     ['Laundry detergent', 'Household'], ['Paper towels', 'Household'], ['Toilet paper', 'Household'], ['Toothpaste', 'Household']
   ];
-  var usuals = ['Milk 2%', 'Eggs', 'Bananas', 'Bread', 'Apples', 'Coffee beans', 'Greek yogurt', 'Cheddar', 'Butter', 'Baby spinach', 'Chicken thighs', 'Paper towels'];
+  // Filled from the Todoist Shopping usuals project after sync.
+  var usuals = [];
 
   // ---------------------------------------------------------------- home control
   var rooms = [

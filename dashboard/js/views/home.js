@@ -112,7 +112,7 @@
   function shopping() {
     var open = D.groceries.filter(function (g) { return !g.done; });
     var recent = open.slice(-3).reverse();
-    return '<div class="label">Shopping</div>' +
+    return '<div class="label">Shopping · Todoist</div><p>' + App.esc(Shopping.state.message) + '</p>' +
       '<div class="h-stat"><span class="num">' + open.length + '</span><small>items to get</small></div>' +
       '<ul class="h-recent">' + recent.map(function (g) {
         return '<li><i></i>' + App.esc(g.name) + '</li>';

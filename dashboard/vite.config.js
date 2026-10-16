@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { localTodoist } from './server/todoist.js';
 import { googleCalendar } from './server/google-calendar.js';
 import { bomObservations } from './server/bom.js';
 import { chatgptUsage } from './server/chatgpt-usage.js';
@@ -8,7 +9,7 @@ import { chatgptUsage } from './server/chatgpt-usage.js';
 // #ffffffbf) even though Chrome 106 should support them, and a newer target lets the minifier
 // rewrite transparent/rgba() into that form. Verified on-device with CSS.supports().
 export default defineConfig({
-  plugins: [bomObservations(), googleCalendar(), chatgptUsage()],
+  plugins: [bomObservations(), googleCalendar(), chatgptUsage(), localTodoist()],
   build: {
     target: 'chrome106',
     cssTarget: 'chrome61',

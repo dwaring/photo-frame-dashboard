@@ -67,3 +67,8 @@
 .s-ac-row { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 0 18px 0 22px; border-radius: 14px; background: var(--card); }
 .s-ac-row b { flex: 1; font-size: 22px; }
 .s-ac-row--new { background: transparent; box-shadow: inset 0 0 0 2px var(--line); }
+
+.s-sync { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; color: var(--mute); font-size: 15px; }
+.shop button:disabled { opacity: .55; cursor: default; }
+.s-tile.is-on:disabled { opacity: 1; }
+.s-usuals { overflow-y: auto; grid-auto-rows: minmax(100px, 1fr); }
