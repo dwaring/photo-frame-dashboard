@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "home-dashboard",
+  "main": "worker/with-chatgpt.js",
+  "compatibility_date": "2026-10-15",
+  "preview_urls": false,
+  "containers": [
+    {
+      "class_name": "ChatgptUsage",
+      "scheduling_policy": "durable_object",
+      "images": {
+        "base": {
+          "dockerfile": "./usage-service/Dockerfile",
+          "build_context": "./usage-service"
+        }
+      }
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CHATGPT_USAGE",
+        "class_name": "ChatgptUsage"
+      }
+    ]
+  },
+  "exports": {
+    "ChatgptUsage": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
+  },
+  "r2_buckets": [
+    {
+      "binding": "PHOTOS",
+      "bucket_name": "home-dashboard-photos"
+    }
+  ],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  }
+}

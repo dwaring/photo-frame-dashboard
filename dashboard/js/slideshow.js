@@ -4,6 +4,7 @@
   var D = window.DATA;
 
   function src(p, big) {
+    if (p.src) return p.src;
     var w = p.o === 'p' ? 800 : 1600, h = p.o === 'p' ? 1200 : 1000;
     if (!big) { w = Math.round(w / 2); h = Math.round(h / 2); }
     return App.img(p.seed, w, h);
@@ -12,6 +13,7 @@
 
   function parseDate(p) { var a = p.date.split('-'); return new Date(+a[0], +a[1] - 1, +a[2]); }
   App.photoMeta = function (p) {
+    if (p.source === 'google-photos') return { date: p.date || 'Imported photo', monthYear: p.date || 'Imported photo', kicker: 'Google Photos', onThisDay: false, place: 'Manual import', from: null };
     var d = parseDate(p), now = App.now();
     var years = now.getFullYear() - d.getFullYear();
     var onThisDay = d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
@@ -71,6 +73,8 @@
     this.count = 0;
     this.timer = null;
     this.current = null;
+    var self = this;
+    App.on('photos-updated', function () { self.queue = []; self.history = []; self.current = null; if (self.timer) self.next(); });
   };
   var S = App.Slideshow.prototype;
 
@@ -88,7 +92,7 @@
   };
   S.pick = function () {
     var layout = this.o.layout, n = this.count++;
-    var first = this.take();
+    var first = this.take(), original = first;
     if (!first) return null;
     var self = this;
     function sibling(pred) {
@@ -101,12 +105,14 @@
     var ps = [first];
     if (layout === 'pair') {
       if (first.o !== 'p') { first = sibling(function (x) { return x.o === 'p'; }); ps = [first]; }
-      ps.push(sibling(function (x) { return x !== first && x.o === 'p' && x.tag === first.tag; }) || sibling(function (x) { return x !== first && x.o === 'p'; }));
+      ps.push(sibling(function (x) { return first && x !== first && x.o === 'p' && x.tag === first.tag; }) || sibling(function (x) { return x !== first && x.o === 'p'; }));
     }
     if (layout === 'collage') {
       ps.push(sibling(function (x) { return x !== first; }));
       ps.push(sibling(function (x) { return ps.indexOf(x) < 0; }));
     }
+    ps = ps.filter(Boolean);
+    if (ps.length < (layout === 'pair' ? 2 : layout === 'collage' ? 3 : 1)) { layout = 'cover'; ps = [first || ps[0] || original]; }
     return { layout: layout, photos: ps };
   };
 

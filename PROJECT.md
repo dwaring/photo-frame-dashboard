@@ -16,7 +16,9 @@ succeeded and confirmed Plus, which the user confirmed is the correct plan.
 The Cloudflare Container/Durable Object adapter is implemented and built.
 A separate service sign-in succeeded and also reported Plus. Deployment is blocked
 because Cloudflare requires the Workers Paid plan for Containers on this account;
-credentials have not been uploaded. Hosted verification remains pending. See docs/chatgpt-usage.md.
+credentials have not been uploaded. Default deployment now omits the optional
+ChatGPT Container; use `npm run deploy:chatgpt` for its separate configuration
+once account access is available. Hosted verification remains pending. See docs/chatgpt-usage.md.
 Coverage of all ChatGPT conversations is not verified. No sample usage is shown.
 Other channels still display upstream sample data and are not connected.
 Initial channels: Google Calendar, Adelaide weather, shared shopping/groceries,
@@ -91,8 +93,10 @@ use; all public assets would be included by a future deployment.
    connected, and stale states.
 5. Spotify: connect account and show playback; add playback controls only after
    account/device capabilities are confirmed.
-6. Photos: choose local folder or cloud album source, then add indexing and
-   original-photo rendering in place of seeded demo images.
+6. Photos: hosted Google Photos Picker manual import implemented with private R2
+   storage. Hosted Google OAuth, selection and import succeeded; user verified photos
+   display. Import controls are available at /api/google-photos/setup.
+   This is a snapshot import, not album sync. See docs/google-photos.md.
 7. Configure Cloudflare Workers hosting and authentication; move required local backend functions to
    the hosted environment. Add persistent storage and backup/restore where
    needed. Verify Android kiosk startup after reboot, touch layout, session

@@ -1,7 +1,7 @@
 // Cloudflare Access protects the entire Worker, including its static assets.
 // Calendar OAuth remains unavailable until its hosted authorization exists.
 import { BOM_URL, FORECAST_URL } from '../server/bom.js';
-export { ChatgptUsage } from './chatgpt-usage.js';
+import { googlePhotos } from './google-photos.js';
 
 function json(body, status = 200) {
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -10,6 +10,7 @@ function json(body, status = 200) {
 export default {
   async fetch(request, env) {
     const path = new URL(request.url).pathname;
+    if (path.startsWith('/api/google-photos/')) return googlePhotos(request, env);
     if (!path.startsWith('/api/')) return env.ASSETS.fetch(request);
     if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405);
     if (path === '/api/chatgpt/usage') {

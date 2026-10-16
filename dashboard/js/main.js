@@ -7,6 +7,7 @@ import './weather.js';
 import './google-calendar.js';
 import './system.js';
 import './slideshow.js';
+import './google-photos.js';
 import './views/home.js';
 import './views/calendar.js';
 import './views/tasks.js';
