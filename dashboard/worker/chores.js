@@ -9,7 +9,7 @@ export function displayChore(task) {
   const slot = slots.filter(p => labels.includes('slot_' + p));
   const scheduled = days.filter(p => labels.includes('day_' + p));
   if (task.is_uncompletable || !who.length || (who.includes('any') && who.length > 1) || !slot.length || !scheduled.length) return null;
-  return { trackingSince: (task.added_at || task.created_at || new Date().toISOString()).slice(0, 10), id: task.id, title: task.content, people: who, slots: slot, days: scheduled, emoji: '✓', completions: {} };
+  return { trackingSince: (task.added_at || task.created_at || new Date().toISOString()).slice(0, 10), id: task.id, title: task.content, people: who, slots: slot, days: scheduled, completions: {} };
 }
 export async function choreRoute(request, env) {
   const url = new URL(request.url);

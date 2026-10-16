@@ -16,7 +16,7 @@
   function row(c, p) {
     var pend = V.pending[c.id];
     return '<button ' + ((!Chores.state.connected || Chores.state.busy || date() > Chores.today()) && !V.editing ? 'disabled ' : '') + 'class="ch' + (c.done ? ' is-done' : '') + (pend ? ' is-checking' : '') + (c.overdue && !c.done ? ' is-overdue' : '') + '" data-ch="' + App.esc(c.id) + '">' +
-      '<span class="ch-emoji">' + App.esc(c.emoji) + '<span class="ch-check"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span></span>' +
+      '<span class="ch-emoji"><span class="ch-check"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span></span>' +
       '<span class="ch-text"><b>' + App.esc(c.title) + '</b>' +
       (c.overdue && !c.done ? '<small class="ch-late">Overdue</small>' : (c.doneBy ? '<small>by ' + App.esc(App.person(c.doneBy).name) + '</small>' : '')) +
       '</span>' +
@@ -96,7 +96,7 @@
 
   // "Anyone" chores record who completed the shared occurrence.
   function whoDidIt(c, btn) {
-    App.sheet('<div class="sheet-pad"><div class="label">' + App.esc(c.emoji) + ' ' + App.esc(c.title) + '</div><h2 class="serif sheet-h">Who did it?</h2>' +
+    App.sheet('<div class="sheet-pad"><div class="label">' + App.esc(c.title) + '</div><h2 class="serif sheet-h">Who did it?</h2>' +
       '<div class="add-who add-who--big">' + D.people.map(function (p) {
         return '<button class="who-btn" data-by="' + p.id + '" style="' + App.pstyle(p) + '">' + App.avatar(p, 88) + '<span>' + p.name + '</span></button>';
       }).join('') + '</div></div>', {

@@ -115,7 +115,7 @@ sync status and omitted until their labels are valid.
 
 Descriptions contain **no dashboard JSON, completion records or generated
 placeholder instructions**. Editing and completing chores never writes notes.
-Emoji metadata was removed; the UI uses a neutral checkmark icon.
+Emoji metadata was removed; unchecked boxes are empty; completed chores show a checkmark.
 
 ### Completion history
 
