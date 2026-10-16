@@ -95,7 +95,7 @@ requests are rejected, and writes require a matching Origin header.
 The **Chores** Todoist project holds chore definitions. One task can apply to
 multiple family members: **Make bed** carries both `person_harvey` and
 `person_frankie` and appears in both lanes. Each person checks off each timeslot independently. **Anyone** is a separate mode: one person does the
-shared chore and receives its stars. It cannot be combined with named people.
+shared chore. It cannot be combined with named people.
 
 | Field | Todoist representation | Dashboard behavior |
 | --- | --- | --- |
@@ -104,10 +104,9 @@ shared chore and receives its stars. It cannot be combined with named people.
 | Timeslot | One or more `slot_morning`, `slot_after`, `slot_evening` labels | Morning, After school, Evening tabs |
 | Weekdays | One or more `day_mon` through `day_sun` labels | Weekly schedule, filtered by selected date |
 | Title / notes | Ordinary Todoist content and description | Title shown; notes remain untouched |
-| Reward | Optional `stars_0` through `stars_5` label, defaults to zero | Stars for each person's completion |
 
 Use **Edit chores**, then tap a chore to change its title, family members,
-timeslot, days and stars. Use **Add chore** for a new definition. The family
+timeslots and days. Use **Add chore** for a new definition. The family
 picker supports multiple selections. Editing a shared definition updates all
 its lanes. Different schedules for different people still require separate tasks:
 each template has one shared set of days and timeslots. Native Todoist assignees are not used; family
@@ -124,7 +123,7 @@ Private hosted storage holds dated checkmarks separately from Todoist definition
 The existing private R2 bucket is reused under the isolated `chores/` prefix;
 photo manifests and image routes do not expose these objects. One object per
 project/task/date/person/timeslot prevents Harvey's completion overwriting Frankie's.
-Records preserve the credited person and stars at completion. Repeated completion
+Records preserve the person who completed the chore. Repeated completion
 of the same occurrence counts once. Reopening only clears that person's date and timeslot.
 For Anyone, the latest completion of that shared occurrence sets its credited person.
 Imported records live in `chores/PROJECT_ID/import.json`; new per-occurrence records
@@ -138,19 +137,19 @@ day labels define the dashboard schedule.
 Dates use Australia/Adelaide. Future dates can be inspected but not checked off.
 Automatic timeslots use the device timezone, which should also be Adelaide.
 The weekly row reflects dates since template creation; earlier and unscheduled
-days are neutral. Stars sum retained records for active templates. Editing the
+days are neutral. Editing the
 schedule changes past and future schedule views; historical membership is not
-versioned. Removing a definition removes its contribution from displayed totals.
+versioned. Removing a definition removes it from the schedule.
 
 ### Migration and configuration
 
 On 2026-10-16, four duplicate pairs (Make bed, Brush teeth, Unpack lunchbox and
 Lay out clothes) were consolidated, with **24 active templates** at final live verification after preserving
-intervening household edits. The original seed contained 33 tasks. Tasks were merged only where title, timeslots, days, reward and Todoist
+intervening household edits. The original seed contained 33 tasks. Tasks were merged only where title, timeslots, days and Todoist
 container matched. Person labels were combined. Redundant tasks had generated
 text removed and were completed, retaining recoverable Todoist history. Ordinary
 notes were preserved. Legacy completion records were migrated to private
-storage with their original person, date and earned stars. The ignored
+storage with their original person, date and timeslot. The ignored
 `.private/chores-redesign-plan.json` holds the original task backup. These are
 still starter chores and assumed schedules requiring household review.
 

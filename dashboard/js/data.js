@@ -21,7 +21,6 @@ window.DATA = (function () {
     { id: 'evening', name: 'Evening', range: '5 – 10 PM', from: 17, to: 24 }
   ];
   var chores = [];
-  var stars = { harvey: 0, frankie: 0 };
   var week = {};
 
   // ---------------------------------------------------------------- shopping
@@ -133,7 +132,7 @@ window.DATA = (function () {
   return {
     people: people, family: family, ALL: ALL,
     events: events,
-    routines: routines, chores: chores, stars: stars, week: week,
+    routines: routines, chores: chores, week: week,
     stores: stores, catOrder: catOrder, groceries: groceries, catalog: catalog, usuals: usuals,
     rooms: rooms, devices: devices, climate: climate, media: media, cameras: cameras, scenes: scenes,
     weather: weather, photos: photos,

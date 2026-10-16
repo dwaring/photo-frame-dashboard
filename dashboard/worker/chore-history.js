@@ -12,14 +12,14 @@ export async function readHistory(bucket, project) {
       const [, , , task, date, person, slot] = object.key.split('/');
       const meta = object.customMetadata;
       if (!meta || meta.done !== 'true') records.delete(completionKey(project, task, date, person, slot));
-      else records.set(completionKey(project, task, date, person, slot), { task, date, person, slot: slot || 'morning', by: meta.by, stars: Number(meta.stars) });
+      else records.set(completionKey(project, task, date, person, slot), { task, date, person, slot: slot || 'morning', by: meta.by });
     }
     cursor = page.truncated ? page.cursor : null;
   } while (cursor);
-  return [...records.values()];
+  return [...records.values()].map(({ task, date, person, slot, by }) => ({ task, date, person, slot, by }));
 }
-export async function writeCompletion(bucket, project, body, stars) {
+export async function writeCompletion(bucket, project, body) {
   const key = completionKey(project, body.id, body.date, body.person, body.r);
   // One object per task/date/person/timeslot. Separate people's writes never overwrite each other.
-  await bucket.put(key, '', { customMetadata: { done: String(body.action === 'complete'), by: body.by, stars: String(stars) } });
+  await bucket.put(key, '', { customMetadata: { done: String(body.action === 'complete'), by: body.by } });
 }

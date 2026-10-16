@@ -16,10 +16,6 @@
   }
   function emit() {
     window.DATA.chores = forDate(today());
-    window.DATA.stars = { harvey: 0, frankie: 0 };
-    state.tasks.forEach(function (c) { Object.keys(c.completions).forEach(function (d) {
-      Object.values(c.completions[d]).forEach(function (slot) { Object.values(slot).forEach(function (hit) { if (window.DATA.stars[hit.by] != null && d <= today()) window.DATA.stars[hit.by] += hit.stars || 0; }); });
-    }); });
     App.emit('data'); App.emit('chores-updated');
   }
   async function api(body) {

@@ -18,7 +18,7 @@
     return '<button ' + ((!Chores.state.connected || Chores.state.busy || date() > Chores.today()) && !V.editing ? 'disabled ' : '') + 'class="ch' + (c.done ? ' is-done' : '') + (pend ? ' is-checking' : '') + (c.overdue && !c.done ? ' is-overdue' : '') + '" data-ch="' + App.esc(c.id) + '">' +
       '<span class="ch-emoji">' + App.esc(c.emoji) + '<span class="ch-check"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span></span>' +
       '<span class="ch-text"><b>' + App.esc(c.title) + '</b>' +
-      (c.overdue && !c.done ? '<small class="ch-late">Overdue</small>' : c.stars ? '<small>' + App.icon('star', 14, 'i--fill') + c.stars + (c.doneBy ? ' · ' + App.person(c.doneBy).name : '') + '</small>' : (c.doneBy ? '<small>by ' + App.person(c.doneBy).name + '</small>' : '')) +
+      (c.overdue && !c.done ? '<small class="ch-late">Overdue</small>' : (c.doneBy ? '<small>by ' + App.esc(App.person(c.doneBy).name) + '</small>' : '')) +
       '</span>' +
       '</button>';
   }
@@ -42,11 +42,10 @@
     var p = App.person(who), list = listFor(who, r);
     var done = list.filter(function (c) { return c.done; }).length;
     var all = list.length && done === list.length;
-    var kid = D.stars[who] != null;
     return '<section class="ch-lane' + (all ? ' is-complete' : '') + '" data-lane="' + who + '" style="' + App.pstyle(p) + '">' +
       '<header class="ch-head">' + App.avatar(p, 42) +
       '<div><b>' + (who === 'any' ? 'Anyone' : p.name) + '</b>' +
-      (kid ? '<span class="ch-stars">' + App.icon('star', 18, 'i--fill') + '<span class="num">' + D.stars[who] + '</span></span>' : '<span class="ch-sub">' + (who === 'any' ? 'Up for grabs' : (list.length ? done + ' of ' + list.length : 'Nothing')) + '</span>') + '</div>' +
+      '<span class="ch-sub">' + (who === 'any' ? 'Up for grabs' : (list.length ? done + ' of ' + list.length : 'Nothing')) + '</span></div>' +
       '<div class="ch-ring">' + App.ring(done, list.length || 1, 46) + '<span class="num">' + (all ? '✓' : list.length ? done + '/' + list.length : '–') + '</span></div>' +
       '</header>' +
       '<div class="ch-list">' + (list.length ? list.map(function (c) { return row(c, p); }).join('') : '<div class="ch-none serif"><i>Nothing this ' + (r.id === 'evening' ? 'evening' : r.id === 'morning' ? 'morning' : 'afternoon') + '</i></div>') +
@@ -80,22 +79,22 @@
   }
 
   function editor(c) {
-    c = c || { title: '', people: ['any'], slots: [routine().id], days: Chores.days.slice(), stars: 1 };
+    c = c || { title: '', people: ['any'], slots: [routine().id], days: Chores.days.slice() };
     App.sheet('<form class="sheet-pad chore-form"><h2 class="serif sheet-h">' + (c.id ? 'Edit chore' : 'Add chore') + '</h2>' +
       '<label>Chore<input name="title" required maxlength="500" value="' + App.esc(c.title) + '"></label>' +
       '<fieldset><legend>Family members · select everyone this chore applies to</legend>' + LANES.map(function (id) { return '<label><input type="checkbox" name="people" value="' + id + '"' + (c.people.includes(id) ? ' checked' : '') + '>' + (id === 'any' ? 'Anyone (one person does it)' : App.esc(App.person(id).name)) + '</label>'; }).join('') + '</fieldset>' +
       '<fieldset><legend>Timeslots</legend>' + D.routines.map(function (r) { return '<label><input type="checkbox" name="slots" value="' + r.id + '"' + (c.slots.includes(r.id) ? ' checked' : '') + '>' + r.name + '</label>'; }).join('') + '</fieldset>' +
       '<fieldset><legend>Days</legend>' + Chores.days.map(function (d) { return '<label><input type="checkbox" name="days" value="' + d + '"' + (c.days.includes(d) ? ' checked' : '') + '>' + d + '</label>'; }).join('') + '</fieldset>' +
-      '<label>Stars<input name="stars" type="number" min="0" max="5" required value="' + c.stars + '"></label><p role="status"></p><button type="submit">Save to Todoist</button></form>', {
+      '<p role="status"></p><button type="submit">Save to Todoist</button></form>', {
       onMount: function (s, close) { s.querySelector('form').addEventListener('submit', async function (e) {
         e.preventDefault(); var f = new FormData(e.target); var button = e.target.querySelector('[type="submit"]'); button.disabled = true;
-        var ok = await Chores.change({ action: 'save', id: c.taskId || c.id, title: f.get('title'), people: f.getAll('people'), slots: f.getAll('slots'), days: f.getAll('days'), stars: Number(f.get('stars')) });
+        var ok = await Chores.change({ action: 'save', id: c.taskId || c.id, title: f.get('title'), people: f.getAll('people'), slots: f.getAll('slots'), days: f.getAll('days') });
         if (ok) close(); else { button.disabled = false; e.target.querySelector('[role="status"]').textContent = Chores.state.message; }
       }); }
     });
   }
 
-  // "Anyone" chores ask who did it, so stars go to the right kid
+  // "Anyone" chores record who completed the shared occurrence.
   function whoDidIt(c, btn) {
     App.sheet('<div class="sheet-pad"><div class="label">' + App.esc(c.emoji) + ' ' + App.esc(c.title) + '</div><h2 class="serif sheet-h">Who did it?</h2>' +
       '<div class="add-who add-who--big">' + D.people.map(function (p) {

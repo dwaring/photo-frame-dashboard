@@ -11,10 +11,10 @@ const bucket = {
 };
 const env = { TODOIST_API_TOKEN: 'secret', TODOIST_CHORES_PROJECT_ID: 'chores', CHORE_HISTORY: bucket };
 const origin = 'https://home.example';
-const task = { id: 'chore1', project_id: 'chores', content: 'Make bed', labels: ['person_harvey', 'person_frankie', 'stars_2', 'slot_morning', 'slot_evening', 'day_fri', 'keep'], description: 'Keep my notes' };
+const task = { id: 'chore1', project_id: 'chores', content: 'Make bed', labels: ['person_harvey', 'person_frankie', 'slot_morning', 'slot_evening', 'day_fri', 'keep'], description: 'Keep my notes' };
 function request(body, headers = {}) { return new Request(origin + '/api/todoist/chores', { method: body ? 'POST' : 'GET', headers: { 'Cf-Access-Jwt-Assertion': 'test', Origin: origin, ...headers }, body: body ? JSON.stringify(body) : undefined }); }
 test('maps only explicitly assigned and scheduled chores', () => {
-  const c = displayChore(task); assert.deepEqual(c.people, ['harvey', 'frankie']); assert.deepEqual(c.slots, ['morning', 'evening']); assert.deepEqual(c.days, ['fri']); assert.equal(c.stars, 2);
+  const c = displayChore(task); assert.deepEqual(c.people, ['harvey', 'frankie']); assert.deepEqual(c.slots, ['morning', 'evening']); assert.deepEqual(c.days, ['fri']);
   assert.equal(displayChore({ ...task, labels: [] }), null);
   assert.equal(displayChore({ ...task, labels: [...task.labels, 'person_any'] }), null);
   assert.equal(displayChore({ ...task, is_uncompletable: true }), null);
@@ -43,15 +43,15 @@ test('shared task records independent completions without changing Todoist descr
     assert.equal((await todoist(request(body), env)).status, 200);
     assert.equal((await todoist(request({ ...body, person: 'frankie', by: 'frankie' }), env)).status, 200);
     let data = await (await todoist(request(), env)).json();
-    assert.deepEqual(data.chores[0].completions[body.date].morning, { harvey: { by: 'harvey', stars: 2 }, frankie: { by: 'frankie', stars: 2 } });
+    assert.deepEqual(data.chores[0].completions[body.date].morning, { harvey: { by: 'harvey' }, frankie: { by: 'frankie' } });
     assert.equal((await todoist(request({ ...body, by: 'frankie' }), env)).status, 400);
     assert.equal((await todoist(request({ ...body, date: '2099-01-02' }), env)).status, 400);
     assert.equal((await todoist(request({ ...body, date: '2026-10-10' }), env)).status, 400);
     assert.equal((await todoist(request({ ...body, r: 'evening' }), env)).status, 200);
     assert.equal((await todoist(request({ ...body, action: 'reopen' }), env)).status, 200);
     data = await (await todoist(request(), env)).json();
-    assert.deepEqual(data.chores[0].completions[body.date].morning, { frankie: { by: 'frankie', stars: 2 } });
-    assert.deepEqual(data.chores[0].completions[body.date].evening, { harvey: { by: 'harvey', stars: 2 } });
+    assert.deepEqual(data.chores[0].completions[body.date].morning, { frankie: { by: 'frankie' } });
+    assert.deepEqual(data.chores[0].completions[body.date].evening, { harvey: { by: 'harvey' } });
   } finally { globalThis.fetch = original; }
 });
 test('cannot edit or complete another project task', async () => {
@@ -65,11 +65,11 @@ test('edits assignments while retaining unrelated labels, notes and completion h
   globalThis.fetch = async (url, options) => {
     if (options.method === 'GET') return Response.json(task);
     const update = JSON.parse(options.body);
-    assert.deepEqual(update.labels, ['keep', 'person_harvey', 'person_frankie', 'stars_2', 'slot_after', 'day_mon', 'day_sat']);
+    assert.deepEqual(update.labels, ['keep', 'person_harvey', 'person_frankie', 'slot_after', 'day_mon', 'day_sat']);
     assert.equal(update.description, undefined); return Response.json(update);
   };
   try {
-    const body = { action: 'save', id: 'chore1', title: 'Read', people: ['harvey', 'frankie'], slots: ['after'], days: ['mon', 'sat'], stars: 2 };
+    const body = { action: 'save', id: 'chore1', title: 'Read', people: ['harvey', 'frankie'], slots: ['after'], days: ['mon', 'sat'] };
     assert.equal((await todoist(request(body), env)).status, 200);
     assert.equal((await todoist(request({ ...body, days: [] }), env)).status, 400);
   } finally { globalThis.fetch = original; }
@@ -77,12 +77,12 @@ test('edits assignments while retaining unrelated labels, notes and completion h
 
 test('imported completions survive cleanup and can be reopened with paginated storage', async () => {
   objects.clear();
-  const hit = { task: 'chore1', date: '2026-10-09', person: 'harvey', by: 'harvey', r: 'morning', stars: 2 };
+  const hit = { task: 'chore1', date: '2026-10-09', person: 'harvey', by: 'harvey', slot: 'morning' };
   objects.set('chores/chores/import.json', { body: JSON.stringify([hit]) });
   assert.deepEqual(await readHistory(bucket, 'chores'), [hit]);
-  objects.set(completionKey('chores', hit.task, hit.date, hit.person, hit.slot), { customMetadata: { done: 'false', by: hit.by, stars: '2' } });
+  objects.set(completionKey('chores', hit.task, hit.date, hit.person, hit.slot), { customMetadata: { done: 'false', by: hit.by } });
   assert.deepEqual(await readHistory(bucket, 'chores'), []);
-  const paged = { get: async () => null, list: async options => options.cursor ? { objects: [{ key: completionKey('chores', 'chore1', '2026-10-09', 'frankie'), customMetadata: { done: 'true', by: 'frankie', stars: '2' } }], truncated: false } : { objects: [], truncated: true, cursor: 'next' } };
+  const paged = { get: async () => null, list: async options => options.cursor ? { objects: [{ key: completionKey('chores', 'chore1', '2026-10-09', 'frankie'), customMetadata: { done: 'true', by: 'frankie' } }], truncated: false } : { objects: [], truncated: true, cursor: 'next' } };
   assert.equal((await readHistory(paged, 'chores'))[0].by, 'frankie');
   objects.clear();
 });
