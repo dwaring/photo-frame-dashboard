@@ -20,50 +20,9 @@ window.DATA = (function () {
     { id: 'after', name: 'After school', range: '11 AM – 5 PM', from: 11, to: 17 },
     { id: 'evening', name: 'Evening', range: '5 – 10 PM', from: 17, to: 24 }
   ];
-  var cid = 0;
-  function chore(r, who, title, emoji, stars, done, extra) {
-    return Object.assign({ id: 'c' + (++cid), r: r, who: who, title: title, emoji: emoji, stars: stars, done: !!done }, extra || {});
-  }
-  var chores = [
-    chore('morning', 'harvey', 'Make bed', '🛏️', 1, true),
-    chore('morning', 'harvey', 'Brush teeth', '🪥', 1, true),
-    chore('morning', 'harvey', 'Pack backpack', '🎒', 1, true),
-    chore('morning', 'frankie', 'Make bed', '🛏️', 1, true),
-    chore('morning', 'frankie', 'Brush teeth', '🪥', 1, true),
-    chore('morning', 'frankie', 'Get dressed', '👕', 1, false),
-    chore('morning', 'darren', 'School drop-off', '🚗', 0, true),
-    chore('morning', 'nadine', 'Pack lunches', '🥪', 0, true),
-    chore('morning', 'any', 'Feed Biscuit', '🐶', 1, true),
-
-    chore('after', 'harvey', 'Unpack lunchbox', '🥪', 1, true),
-    chore('after', 'harvey', 'Homework', '📚', 2, false),
-    chore('after', 'harvey', 'Pack soccer bag', '⚽', 1, false),
-    chore('after', 'frankie', 'Unpack lunchbox', '🥪', 1, true),
-    chore('after', 'frankie', 'Read for 20 min', '📖', 2, false),
-    chore('after', 'frankie', 'Practice piano', '🎹', 2, false),
-    chore('after', 'frankie', 'Tidy the Lego', '🧱', 1, false),
-    chore('after', 'darren', 'Take out recycling', '♻️', 0, false, { overdue: true }),
-    chore('after', 'darren', 'Call the plumber', '☎️', 0, true),
-    chore('after', 'nadine', 'Fold laundry', '🧺', 0, false),
-    chore('after', 'nadine', 'Order Zoe’s gift', '🎁', 0, true),
-    chore('after', 'any', 'Water the plants', '🪴', 1, false),
-    chore('after', 'any', 'Empty dishwasher', '🍽️', 2, false),
-    chore('after', 'any', 'Walk Biscuit', '🐕', 2, true),
-
-    chore('evening', 'harvey', 'Set the table', '🍴', 1, false),
-    chore('evening', 'harvey', 'Lay out clothes', '👕', 1, false),
-    chore('evening', 'harvey', 'Shower', '🚿', 1, false),
-    chore('evening', 'frankie', 'Clear plates', '🍽️', 1, false),
-    chore('evening', 'frankie', 'Bath', '🛁', 1, false),
-    chore('evening', 'frankie', 'Lay out clothes', '👕', 1, false),
-    chore('evening', 'darren', 'Lock up', '🔐', 0, false),
-    chore('evening', 'nadine', 'Run dishwasher', '🫧', 0, false),
-    chore('evening', 'any', 'Wipe counters', '🧽', 1, false),
-    chore('evening', 'any', 'Garbage to curb', '🗑️', 2, false)
-  ];
-  var stars = { harvey: 42, frankie: 57 };
-  // Mon..Sun, 1 = all chores done, 0 = missed, null = future
-  var week = { harvey: [1, 1, 0, 1, 1, 0, 1], frankie: [1, 0, 1, 1, 1, 1, 0] };
+  var chores = [];
+  var stars = { harvey: 0, frankie: 0 };
+  var week = {};
 
   // ---------------------------------------------------------------- shopping
   var stores = [{ id: 'grocer', name: 'Woolworths' }, { id: 'amazon', name: 'Amazon' }];

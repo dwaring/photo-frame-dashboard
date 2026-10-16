@@ -2,19 +2,21 @@
 (function () {
   'use strict';
   var D = window.DATA;
-  var V = { el: null, routine: null, pending: {} };
+  var V = { el: null, routine: null, date: null, editing: false, pending: {} };
   var LANES = ['darren', 'nadine', 'harvey', 'frankie', 'any'];
 
+  function date() { return V.date || Chores.today(); }
+  function chores() { return Chores.forDate(date()); }
   function routine() { return V.routine ? D.routines.filter(function (r) { return r.id === V.routine; })[0] : App.currentRoutine(); }
   function listFor(who, r) {
-    return D.chores.filter(function (c) { return c.r === r.id && c.who === who; })
+    return chores().filter(function (c) { return c.r === r.id && c.who === who; })
       .sort(function (a, b) { return (a.done - b.done) || ((b.overdue ? 1 : 0) - (a.overdue ? 1 : 0)); });
   }
 
   function row(c, p) {
     var pend = V.pending[c.id];
-    return '<button class="ch' + (c.done ? ' is-done' : '') + (pend ? ' is-checking' : '') + (c.overdue && !c.done ? ' is-overdue' : '') + '" data-ch="' + c.id + '">' +
-      '<span class="ch-emoji">' + c.emoji + '<span class="ch-check"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span></span>' +
+    return '<button ' + ((!Chores.state.connected || Chores.state.busy || date() > Chores.today()) && !V.editing ? 'disabled ' : '') + 'class="ch' + (c.done ? ' is-done' : '') + (pend ? ' is-checking' : '') + (c.overdue && !c.done ? ' is-overdue' : '') + '" data-ch="' + App.esc(c.id) + '">' +
+      '<span class="ch-emoji">' + App.esc(c.emoji) + '<span class="ch-check"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span></span>' +
       '<span class="ch-text"><b>' + App.esc(c.title) + '</b>' +
       (c.overdue && !c.done ? '<small class="ch-late">Overdue</small>' : c.stars ? '<small>' + App.icon('star', 14, 'i--fill') + c.stars + (c.doneBy ? ' · ' + App.person(c.doneBy).name : '') + '</small>' : (c.doneBy ? '<small>by ' + App.person(c.doneBy).name + '</small>' : '')) +
       '</span>' +
@@ -22,11 +24,16 @@
   }
 
   function weekGrid(id) {
-    var w = D.week[id];
-    if (!w) return '';
-    var today = (App.now().getDay() + 6) % 7;
+    var base = new Date(Chores.today() + 'T12:00:00Z');
+    base.setUTCDate(base.getUTCDate() - (base.getUTCDay() + 6) % 7);
+    var w = Array.from({ length: 7 }, function (_, i) {
+      var d = new Date(base); d.setUTCDate(d.getUTCDate() + i); var key = d.toISOString().slice(0, 10);
+      var scheduled = Chores.forDate(key).filter(function (c) { return c.who === id && key >= c.trackingSince; });
+      return key > Chores.today() || !scheduled.length ? null : scheduled.every(function (c) { return c.done; }) ? 1 : 0;
+    });
+    var today = (new Date(Chores.today() + 'T12:00:00Z').getUTCDay() + 6) % 7;
     return '<div class="ch-week"><div class="label">This week</div><div class="ch-week-row">' + ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(function (d, i) {
-      var cls = i > today ? 'is-future' : i === today ? 'is-today' : (w[i] ? 'is-hit' : 'is-miss');
+      var cls = w[i] === null ? 'is-future' : i === today ? 'is-today' : (w[i] ? 'is-hit' : 'is-miss');
       return '<span class="' + cls + '"><i></i>' + d + '</span>';
     }).join('') + '</div></div>';
   }
@@ -50,7 +57,7 @@
 
   function render() {
     var r = routine(), auto = App.currentRoutine();
-    var inR = D.chores.filter(function (c) { return c.r === r.id; });
+    var inR = chores().filter(function (c) { return c.r === r.id; });
     var done = inR.filter(function (c) { return c.done; }).length;
     V.el.innerHTML = '<div class="tasks">' +
       '<header class="t-head">' +
@@ -58,45 +65,39 @@
       '<div class="seg">' + D.routines.map(function (x) { return '<button class="' + (x.id === r.id ? 'is-on' : '') + '" data-r="' + x.id + '">' + x.name + '</button>'; }).join('') + '</div>' +
       '<div class="t-progress"><span class="num">' + done + '<small>/' + inR.length + '</small></span><div class="t-bar"><i style="width:' + (inR.length ? done / inR.length * 100 : 0) + '%"></i></div><span class="label">done</span></div>' +
       '</header>' +
+      '<div class="ch-controls"><input aria-label="Chore date" type="date" data-date value="' + date() + '"><span role="status">' + App.esc(Chores.state.message) + (V.editing ? ' · Tap a chore to edit' : '') + '</span><button data-refresh>Refresh</button><button data-edit>' + (V.editing ? 'Finish editing' : 'Edit chores') + '</button><button data-add>Add chore</button></div>' +
       '<div class="ch-lanes">' + LANES.map(function (w) { return lane(w, r); }).join('') + '</div>' +
       '</div>';
   }
 
-  function complete(c, btn, by) {
-    var r = routine();
+  async function complete(c, btn, by) {
+    if (V.pending[c.id]) return;
     V.pending[c.id] = true;
-    btn.classList.add('is-checking');
-    setTimeout(function () {
-      delete V.pending[c.id];
-      c.done = true;
-      if (by) c.doneBy = by;
-      var earner = D.stars[c.who] != null ? c.who : (by && D.stars[by] != null ? by : null);
-      if (earner && c.stars) D.stars[earner] += c.stars;
-      render();
-      App.emit('data');
-      var laneList = listFor(c.who, r);
-      var laneDone = laneList.every(function (x) { return x.done; });
-      var allDone = D.chores.filter(function (x) { return x.r === r.id; }).every(function (x) { return x.done; });
-      if (allDone) {
-        App.toast('<b>' + r.name + ' routine complete!</b> Everyone crushed it.', { icon: 'star', ms: 5000 });
-        return;
-      }
-      App.toast('<b>' + App.esc(c.title) + '</b> done' + (earner && c.stars ? ' · +' + c.stars + '★ ' + App.person(earner).name : ''), {
-        icon: 'check',
-        undo: function () {
-          c.done = false;
-          delete c.doneBy;
-          if (earner && c.stars) D.stars[earner] -= c.stars;
-          render();
-          App.emit('data');
-        }
-      });
-    }, 350);
+    var ok = await Chores.change({ action: c.done ? 'reopen' : 'complete', id: c.taskId, person: c.who, r: c.r, date: date(), by: by || c.doneBy || c.who });
+    delete V.pending[c.id];
+    render();
+    if (ok) App.toast(App.esc(c.title) + (c.done ? ' reopened' : ' done'), { icon: 'check' });
+  }
+
+  function editor(c) {
+    c = c || { title: '', people: ['any'], slots: [routine().id], days: Chores.days.slice(), stars: 1 };
+    App.sheet('<form class="sheet-pad chore-form"><h2 class="serif sheet-h">' + (c.id ? 'Edit chore' : 'Add chore') + '</h2>' +
+      '<label>Chore<input name="title" required maxlength="500" value="' + App.esc(c.title) + '"></label>' +
+      '<fieldset><legend>Family members · select everyone this chore applies to</legend>' + LANES.map(function (id) { return '<label><input type="checkbox" name="people" value="' + id + '"' + (c.people.includes(id) ? ' checked' : '') + '>' + (id === 'any' ? 'Anyone (one person does it)' : App.esc(App.person(id).name)) + '</label>'; }).join('') + '</fieldset>' +
+      '<fieldset><legend>Timeslots</legend>' + D.routines.map(function (r) { return '<label><input type="checkbox" name="slots" value="' + r.id + '"' + (c.slots.includes(r.id) ? ' checked' : '') + '>' + r.name + '</label>'; }).join('') + '</fieldset>' +
+      '<fieldset><legend>Days</legend>' + Chores.days.map(function (d) { return '<label><input type="checkbox" name="days" value="' + d + '"' + (c.days.includes(d) ? ' checked' : '') + '>' + d + '</label>'; }).join('') + '</fieldset>' +
+      '<label>Stars<input name="stars" type="number" min="0" max="5" required value="' + c.stars + '"></label><p role="status"></p><button type="submit">Save to Todoist</button></form>', {
+      onMount: function (s, close) { s.querySelector('form').addEventListener('submit', async function (e) {
+        e.preventDefault(); var f = new FormData(e.target); var button = e.target.querySelector('[type="submit"]'); button.disabled = true;
+        var ok = await Chores.change({ action: 'save', id: c.taskId || c.id, title: f.get('title'), people: f.getAll('people'), slots: f.getAll('slots'), days: f.getAll('days'), stars: Number(f.get('stars')) });
+        if (ok) close(); else { button.disabled = false; e.target.querySelector('[role="status"]').textContent = Chores.state.message; }
+      }); }
+    });
   }
 
   // "Anyone" chores ask who did it, so stars go to the right kid
   function whoDidIt(c, btn) {
-    App.sheet('<div class="sheet-pad"><div class="label">' + c.emoji + ' ' + App.esc(c.title) + '</div><h2 class="serif sheet-h">Who did it?</h2>' +
+    App.sheet('<div class="sheet-pad"><div class="label">' + App.esc(c.emoji) + ' ' + App.esc(c.title) + '</div><h2 class="serif sheet-h">Who did it?</h2>' +
       '<div class="add-who add-who--big">' + D.people.map(function (p) {
         return '<button class="who-btn" data-by="' + p.id + '" style="' + App.pstyle(p) + '">' + App.avatar(p, 88) + '<span>' + p.name + '</span></button>';
       }).join('') + '</div></div>', {
@@ -114,19 +115,16 @@
 
   function onClick(e) {
     var t;
+    if (e.target.closest('[data-refresh]')) { Chores.sync(); return; }
+    if (e.target.closest('[data-edit]')) { V.editing = !V.editing; return render(); }
+    if (e.target.closest('[data-add]')) { if (Chores.state.connected && !Chores.state.busy) editor(); return; }
     if ((t = e.target.closest('[data-r]'))) { V.routine = t.dataset.r === App.currentRoutine().id ? null : t.dataset.r; return render(); }
     if ((t = e.target.closest('[data-ch]'))) {
-      var c = D.chores.filter(function (x) { return x.id === t.dataset.ch; })[0];
+      var c = chores().filter(function (x) { return x.id === t.dataset.ch; })[0];
       if (!c || V.pending[c.id]) return;
-      if (c.done) {
-        c.done = false;
-        var earner = D.stars[c.who] != null ? c.who : (c.doneBy && D.stars[c.doneBy] != null ? c.doneBy : null);
-        if (earner && c.stars) D.stars[earner] -= c.stars;
-        delete c.doneBy;
-        render();
-        App.emit('data');
-        return;
-      }
+      if (V.editing) { if (Chores.state.connected && !Chores.state.busy) editor(c); return; }
+      if (!Chores.state.connected || Chores.state.busy || date() > Chores.today()) return;
+      if (c.done) return complete(c, t);
       if (c.who === 'any') return whoDidIt(c, t);
       complete(c, t);
     }
@@ -134,9 +132,10 @@
 
   App.register('tasks', {
     show: function (el) {
-      if (!V.el) { V.el = el; el.addEventListener('click', onClick); }
+      if (!V.el) { V.el = el; el.addEventListener('click', onClick); el.addEventListener('change', function (e) { if (e.target.matches('[data-date]')) { V.date = /^\d{4}-\d{2}-\d{2}$/.test(e.target.value) ? e.target.value : null; render(); } }); }
       render();
     }
   });
-  App.on('time', function () { V.routine = null; });
+  App.on('chores-updated', function () { if (V.el) render(); });
+  App.on('time', function () { V.routine = null; if (V.el) render(); });
 })();

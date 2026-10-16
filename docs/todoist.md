@@ -1,4 +1,4 @@
-# Todoist shopping
+# Todoist shopping and chores
 
 Shopping uses the Todoist Shopping project as its durable source. Sample groceries
 have been removed, including the home-screen preview. Other dashboard channels
@@ -73,7 +73,8 @@ and project selections from `.private/todoist.json` at the repository root:
 ```json
 {
   "shoppingProjectId": "YOUR_SHOPPING_PROJECT_ID",
-  "usualsProjectId": "YOUR_SHOPPING_USUALS_PROJECT_ID"
+  "usualsProjectId": "YOUR_SHOPPING_USUALS_PROJECT_ID",
+  "choresProjectId": "YOUR_CHORES_PROJECT_ID"
 }
 ```
 
@@ -87,3 +88,86 @@ Start using the standalone launcher or run `npm run dev -- --host 127.0.0.1
 http://127.0.0.1:5173/#shopping. Restart Vite once after adding this plugin.
 The route requires a loopback peer and localhost Host header. Cross-origin
 requests are rejected, and writes require a matching Origin header.
+
+
+## Chores
+
+The **Chores** Todoist project holds chore definitions. One task can apply to
+multiple family members: **Make bed** carries both `person_harvey` and
+`person_frankie` and appears in both lanes. Each person checks off each timeslot independently. **Anyone** is a separate mode: one person does the
+shared chore and receives its stars. It cannot be combined with named people.
+
+| Field | Todoist representation | Dashboard behavior |
+| --- | --- | --- |
+| Family members | One or more `person_darren`, `person_nadine`, `person_harvey`, `person_frankie` labels | One occurrence per selected person and timeslot |
+| Shared chore | `person_any` alone | Anyone lane; asks who did it |
+| Timeslot | One or more `slot_morning`, `slot_after`, `slot_evening` labels | Morning, After school, Evening tabs |
+| Weekdays | One or more `day_mon` through `day_sun` labels | Weekly schedule, filtered by selected date |
+| Title / notes | Ordinary Todoist content and description | Title shown; notes remain untouched |
+| Reward | Optional `stars_0` through `stars_5` label, defaults to zero | Stars for each person's completion |
+
+Use **Edit chores**, then tap a chore to change its title, family members,
+timeslot, days and stars. Use **Add chore** for a new definition. The family
+picker supports multiple selections. Editing a shared definition updates all
+its lanes. Different schedules for different people still require separate tasks:
+each template has one shared set of days and timeslots. Native Todoist assignees are not used; family
+members do not need separate Todoist accounts. Unmapped tasks are counted in the
+sync status and omitted until their labels are valid.
+
+Descriptions contain **no dashboard JSON, completion records or generated
+placeholder instructions**. Editing and completing chores never writes notes.
+Emoji metadata was removed; the UI uses a neutral checkmark icon.
+
+### Completion history
+
+Private hosted storage holds dated checkmarks separately from Todoist definitions.
+The existing private R2 bucket is reused under the isolated `chores/` prefix;
+photo manifests and image routes do not expose these objects. One object per
+project/task/date/person/timeslot prevents Harvey's completion overwriting Frankie's.
+Records preserve the credited person and stars at completion. Repeated completion
+of the same occurrence counts once. Reopening only clears that person's date and timeslot.
+For Anyone, the latest completion of that shared occurrence sets its credited person.
+Imported records live in `chores/PROJECT_ID/import.json`; new per-occurrence records
+and reopen tombstones override them without rewriting the import.
+
+Keep templates **active in Todoist**. Checking off a native Todoist task removes
+it from the dashboard. Dashboard checkmarks do not close it. Todoist due dates
+and native recurrence are not used for these weekly templates; person, slot and
+day labels define the dashboard schedule.
+
+Dates use Australia/Adelaide. Future dates can be inspected but not checked off.
+Automatic timeslots use the device timezone, which should also be Adelaide.
+The weekly row reflects dates since template creation; earlier and unscheduled
+days are neutral. Stars sum retained records for active templates. Editing the
+schedule changes past and future schedule views; historical membership is not
+versioned. Removing a definition removes its contribution from displayed totals.
+
+### Migration and configuration
+
+On 2026-10-16, four duplicate pairs (Make bed, Brush teeth, Unpack lunchbox and
+Lay out clothes) were consolidated, with **24 active templates** at final live verification after preserving
+intervening household edits. The original seed contained 33 tasks. Tasks were merged only where title, timeslots, days, reward and Todoist
+container matched. Person labels were combined. Redundant tasks had generated
+text removed and were completed, retaining recoverable Todoist history. Ordinary
+notes were preserved. Legacy completion records were migrated to private
+storage with their original person, date and earned stars. The ignored
+`.private/chores-redesign-plan.json` holds the original task backup. These are
+still starter chores and assumed schedules requiring household review.
+
+The local server setting is `choresProjectId`; the hosted secret is
+`TODOIST_CHORES_PROJECT_ID`, alongside the existing API token. The route
+`/api/todoist/chores` enforces Access, same-origin writes and project membership.
+No service secrets are included in browser configuration. Hosted reads and
+completion writes use the existing `PHOTOS` R2 binding under the chores prefix.
+
+Local Vite development uses ignored `.private/chore-history/` files for history.
+**Local and hosted checkmarks are separate**; definition edits still update the
+same live Todoist project. Initial migrated history is copied to both stores.
+The deployed tablet needs no Mac or home server.
+
+Reads refresh every minute and after changes. Failures retain in-memory data with
+a stale status and disable changes. No persistent browser cache or offline edits
+are implemented. Tests cover shared labels, independent person checkmarks,
+history migration/reopen, paginated storage, UI controls, and existing request
+boundaries. Authenticated hosted rendering and tablet touch layout still require
+user verification.

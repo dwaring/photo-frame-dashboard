@@ -1,3 +1,4 @@
+import { choreRoute } from './chores.js';
 const json = (body, status = 200) => Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
 export function displayTask(t) {
   const match = /\s+×([1-9]\d{0,2})$/.exec(t.content);
@@ -8,6 +9,7 @@ export function displayTask(t) {
 export async function todoist(request, env) {
   const url = new URL(request.url);
   if (!request.headers.get('Cf-Access-Jwt-Assertion')) return json({ error: 'Dashboard sign-in required' }, 401);
+  if (url.pathname === '/api/todoist/chores') return choreRoute(request, env);
   if (!env.TODOIST_API_TOKEN || !env.TODOIST_PROJECT_ID) return json({ error: 'Todoist is not connected.', connected: false }, 503);
   if (!['GET', 'POST'].includes(request.method)) return json({ error: 'Method not allowed' }, 405);
   if (request.method === 'POST' && request.headers.get('Origin') !== url.origin) return json({ error: 'Invalid origin' }, 403);
