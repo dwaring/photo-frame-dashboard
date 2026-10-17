@@ -16,8 +16,8 @@ window.DATA = (function () {
 
   // ---------------------------------------------------------------- chores
   var routines = [
-    { id: 'morning', name: 'Morning', range: '6 – 11 AM', from: 0, to: 11 },
-    { id: 'after', name: 'After school', range: '11 AM – 5 PM', from: 11, to: 17 },
+    { id: 'morning', name: 'Morning', range: 'Before midday', from: 0, to: 12 },
+    { id: 'after', name: 'After school', range: '12 – 5 PM', from: 12, to: 17 },
     { id: 'evening', name: 'Evening', range: '5 – 10 PM', from: 17, to: 24 }
   ];
   var chores = [];

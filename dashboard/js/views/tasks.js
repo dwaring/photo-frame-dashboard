@@ -7,7 +7,10 @@
 
   function date() { return V.date || Chores.today(); }
   function chores() { return Chores.forDate(date()); }
-  function routine() { return V.routine ? D.routines.filter(function (r) { return r.id === V.routine; })[0] : App.currentRoutine(); }
+  function routine() {
+    var r = V.routine ? D.routines.filter(function (r) { return r.id === V.routine; })[0] : App.currentRoutine();
+    return Object.assign({}, r, { name: App.routineName(D.routines.find(function (x) { return x.id === r.id; }), date()) });
+  }
   function listFor(who, r) {
     return chores().filter(function (c) { return c.r === r.id && c.who === who; })
       .sort(function (a, b) { return (a.done - b.done) || ((b.overdue ? 1 : 0) - (a.overdue ? 1 : 0)); });
@@ -61,7 +64,7 @@
     V.el.innerHTML = '<div class="tasks">' +
       '<header class="t-head">' +
       '<div class="t-title"><div class="label">' + (r.id === auto.id ? 'Right now · ' : '') + r.range + '</div><h1 class="serif">' + r.name + '</h1></div>' +
-      '<div class="seg">' + D.routines.map(function (x) { return '<button class="' + (x.id === r.id ? 'is-on' : '') + '" data-r="' + x.id + '">' + x.name + '</button>'; }).join('') + '</div>' +
+      '<div class="seg">' + D.routines.map(function (x) { return '<button class="' + (x.id === r.id ? 'is-on' : '') + '" data-r="' + x.id + '">' + App.routineName(x, date()) + '</button>'; }).join('') + '</div>' +
       '<div class="t-progress"><span class="num">' + done + '<small>/' + inR.length + '</small></span><div class="t-bar"><i style="width:' + (inR.length ? done / inR.length * 100 : 0) + '%"></i></div><span class="label">done</span></div>' +
       '</header>' +
       '<div class="ch-controls"><input aria-label="Chore date" type="date" data-date value="' + date() + '"><span role="status">' + App.esc(Chores.state.message) + (V.editing ? ' · Tap a chore to edit' : '') + '</span><button data-refresh>Refresh</button><button data-edit>' + (V.editing ? 'Finish editing' : 'Edit chores') + '</button><button data-add>Add chore</button></div>' +
@@ -83,7 +86,7 @@
     App.sheet('<form class="sheet-pad chore-form"><h2 class="serif sheet-h">' + (c.id ? 'Edit chore' : 'Add chore') + '</h2>' +
       '<label>Chore<input name="title" required maxlength="500" value="' + App.esc(c.title) + '"></label>' +
       '<fieldset><legend>Family members · select everyone this chore applies to</legend>' + LANES.map(function (id) { return '<label><input type="checkbox" name="people" value="' + id + '"' + (c.people.includes(id) ? ' checked' : '') + '>' + (id === 'any' ? 'Anyone (one person does it)' : App.esc(App.person(id).name)) + '</label>'; }).join('') + '</fieldset>' +
-      '<fieldset><legend>Timeslots</legend>' + D.routines.map(function (r) { return '<label><input type="checkbox" name="slots" value="' + r.id + '"' + (c.slots.includes(r.id) ? ' checked' : '') + '>' + r.name + '</label>'; }).join('') + '</fieldset>' +
+      '<fieldset><legend>Timeslots</legend>' + D.routines.map(function (r) { return '<label><input type="checkbox" name="slots" value="' + r.id + '"' + (c.slots.includes(r.id) ? ' checked' : '') + '>' + App.routineName(r, date()) + '</label>'; }).join('') + '</fieldset>' +
       '<fieldset><legend>Days</legend>' + Chores.days.map(function (d) { return '<label><input type="checkbox" name="days" value="' + d + '"' + (c.days.includes(d) ? ' checked' : '') + '>' + d + '</label>'; }).join('') + '</fieldset>' +
       '<p role="status"></p><button type="submit">Save to Todoist</button></form>', {
       onMount: function (s, close) { s.querySelector('form').addEventListener('submit', async function (e) {

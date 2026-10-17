@@ -135,7 +135,9 @@ and native recurrence are not used for these weekly templates; person, slot and
 day labels define the dashboard schedule.
 
 Dates use Australia/Adelaide. Future dates can be inspected but not checked off.
-Automatic timeslots use the device timezone, which should also be Adelaide.
+Morning covers all time before midday; the next timeslot runs noon–5 PM.
+It is labelled After school on weekdays and Afternoon on weekends, including
+when viewing another date. Automatic timeslots use the device timezone, which should also be Adelaide.
 The weekly row reflects dates since template creation; earlier and unscheduled
 days are neutral. Editing the
 schedule changes past and future schedule views; historical membership is not

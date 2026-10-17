@@ -117,9 +117,13 @@
   };
 
   // ------------------------------------------------------------ chores + weather helpers
+  App.routineName = function (r, date) {
+    var day = date ? new Date(date + 'T12:00:00Z').getUTCDay() : App.now().getDay();
+    return r.id === 'after' && (day === 0 || day === 6) ? 'Afternoon' : r.name;
+  };
   App.currentRoutine = function () {
     var h = App.now().getHours();
-    for (var i = 0; i < D.routines.length; i++) if (h >= D.routines[i].from && h < D.routines[i].to) return D.routines[i];
+    for (var i = 0; i < D.routines.length; i++) if (h >= D.routines[i].from && h < D.routines[i].to) return Object.assign({}, D.routines[i], { name: App.routineName(D.routines[i]) });
     return D.routines[2];
   };
   // ------------------------------------------------------------ router

@@ -27,7 +27,7 @@ test('chores view scopes lanes by timeslot and date, and exposes mapping editor'
     { id: 'after1', title: 'Read after school', who: 'frankie', people: ['frankie'], slots: ['after'], r: 'after', days: ['fri'], emoji: '📖', done: false }
   ];
   const routines = [{ id: 'morning', name: 'Morning', range: '6–11' }, { id: 'after', name: 'After school', range: '11–17' }, { id: 'evening', name: 'Evening', range: '17–24' }];
-  const app = { register: (id, v) => views[id] = v, on() {}, currentRoutine: () => routines[0], esc: s => String(s).replaceAll('"', '&quot;'), person: id => ({ id, name: id }), pstyle: () => '', avatar: () => '', ring: () => '', icon: () => '', sheet: html => form = html };
+  const app = { register: (id, v) => views[id] = v, on() {}, currentRoutine: () => routines[0], routineName: (r, date) => r.id === 'after' && ['2026-10-17', '2026-10-18'].includes(date) ? 'Afternoon' : r.name, esc: s => String(s).replaceAll('"', '&quot;'), person: id => ({ id, name: id }), pstyle: () => '', avatar: () => '', ring: () => '', icon: () => '', sheet: html => form = html };
   const context = { window: { DATA: { routines } }, App: app, Date, Chores: { today: () => day, days: ['mon','tue','wed','thu','fri','sat','sun'], state: { connected: true, busy: false, message: 'Synced' }, forDate: d => d === day ? tasks : [] } };
   vm.runInNewContext(await readFile(new URL('./views/tasks.js', import.meta.url), 'utf8'), context);
   const el = { addEventListener: (e, f) => listeners[e] = f, innerHTML: '' };
@@ -36,7 +36,7 @@ test('chores view scopes lanes by timeslot and date, and exposes mapping editor'
   click('[data-r]', { r: 'after' }); assert.match(el.innerHTML, /Read after school/); assert.doesNotMatch(el.innerHTML, /Morning bed/);
   click('[data-edit]'); click('[data-ch]', { ch: 'after1' });
   assert.match(form, /name="people"/); assert.match(form, /name="slots"/); assert.equal((form.match(/name="days"/g) || []).length, 7);
-  listeners.change({ target: { matches: () => true, value: '2026-10-17' } }); assert.doesNotMatch(el.innerHTML, /Read after school/);
+  listeners.change({ target: { matches: () => true, value: '2026-10-17' } }); assert.doesNotMatch(el.innerHTML, /Read after school/); assert.match(el.innerHTML, /Afternoon/); assert.doesNotMatch(el.innerHTML, />After school</);
 });
 
 test('one shared Todoist task appears in both lanes with independent checkmarks', async () => {
