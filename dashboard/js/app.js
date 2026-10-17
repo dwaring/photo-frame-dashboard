@@ -49,6 +49,7 @@
     dayShort: function (d) { return DAYS[d.getDay()].slice(0, 3); },
     month: function (d) { return MONTHS[d.getMonth()]; },
     monthShort: function (d) { return MON_SHORT[d.getMonth()]; },
+    date: function (d) { return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear(); },
     mins: function (m) {
       m = Math.max(0, Math.round(m));
       if (m < 60) return m + ' min';

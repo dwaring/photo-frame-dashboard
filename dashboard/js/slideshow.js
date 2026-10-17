@@ -13,14 +13,17 @@
 
   function parseDate(p) { var a = p.date.split('-'); return new Date(+a[0], +a[1] - 1, +a[2]); }
   App.photoMeta = function (p) {
-    if (p.source === 'google-photos') return { date: p.date || 'Imported photo', monthYear: p.date || 'Imported photo', kicker: 'Google Photos', onThisDay: false, place: '', from: null };
+    if (p.source === 'google-photos') {
+      var label = p.date ? App.fmt.date(parseDate(p)) : 'Imported photo';
+      return { date: label, monthYear: label, kicker: 'Google Photos', onThisDay: false, place: '', from: null };
+    }
     var d = parseDate(p), now = App.now();
     var years = now.getFullYear() - d.getFullYear();
     var onThisDay = d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
     var kicker = onThisDay ? years + (years === 1 ? ' year' : ' years') + ' ago today' : (years > 0 ? years + (years === 1 ? ' year ago' : ' years ago') : 'This year');
     return {
-      date: App.fmt.month(d) + ' ' + d.getDate() + ', ' + d.getFullYear(),
-      monthYear: App.fmt.month(d) + ' ' + d.getFullYear(),
+      date: App.fmt.date(d),
+      monthYear: App.fmt.date(d),
       kicker: kicker, onThisDay: onThisDay, place: p.place, from: App.person(p.from)
     };
   };
