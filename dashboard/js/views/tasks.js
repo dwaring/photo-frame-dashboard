@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var D = window.DATA;
-  var V = { el: null, routine: null, date: null, editing: false, pending: {} };
+  var V = { el: null, routine: null, date: null, editing: false, controlsOpen: false, pending: {} };
   var LANES = ['darren', 'nadine', 'harvey', 'frankie', 'any'];
 
   function date() { return V.date || Chores.today(); }
@@ -66,8 +66,9 @@
       '<div class="t-title"><div class="label">' + (r.id === auto.id ? 'Right now · ' : '') + r.range + '</div><h1 class="serif">' + r.name + '</h1></div>' +
       '<div class="seg">' + D.routines.map(function (x) { return '<button class="' + (x.id === r.id ? 'is-on' : '') + '" data-r="' + x.id + '">' + App.routineName(x, date()) + '</button>'; }).join('') + '</div>' +
       '<div class="t-progress"><span class="num">' + done + '<small>/' + inR.length + '</small></span><div class="t-bar"><i style="width:' + (inR.length ? done / inR.length * 100 : 0) + '%"></i></div><span class="label">done</span></div>' +
+      '<button class="ch-controls-toggle" data-toggle-controls aria-expanded="' + V.controlsOpen + '" aria-controls="chore-controls">' + (V.controlsOpen ? 'Hide controls' : 'Controls') + '</button>' +
       '</header>' +
-      '<div class="ch-controls"><input aria-label="Chore date" type="date" data-date value="' + date() + '"><span role="status">' + App.esc(Chores.state.message) + (V.editing ? ' · Tap a chore to edit' : '') + '</span><button data-refresh>Refresh</button><button data-edit>' + (V.editing ? 'Finish editing' : 'Edit chores') + '</button><button data-add>Add chore</button></div>' +
+      '<div id="chore-controls" class="ch-controls"' + (V.controlsOpen ? '' : ' hidden') + '><input aria-label="Chore date" type="date" data-date value="' + date() + '"><span role="status">' + App.esc(Chores.state.message) + (V.editing ? ' · Tap a chore to edit' : '') + '</span><button data-refresh>Refresh</button><button data-edit>' + (V.editing ? 'Finish editing' : 'Edit chores') + '</button><button data-add>Add chore</button></div>' +
       '<div class="ch-lanes">' + LANES.map(function (w) { return lane(w, r); }).join('') + '</div>' +
       '</div>';
   }
@@ -117,6 +118,13 @@
 
   function onClick(e) {
     var t;
+    if (e.target.closest('[data-toggle-controls]')) {
+      V.controlsOpen = !V.controlsOpen;
+      if (!V.controlsOpen) V.editing = false;
+      render();
+      V.el.querySelector('[data-toggle-controls]').focus();
+      return;
+    }
     if (e.target.closest('[data-refresh]')) { Chores.sync(); return; }
     if (e.target.closest('[data-edit]')) { V.editing = !V.editing; return render(); }
     if (e.target.closest('[data-add]')) { if (Chores.state.connected && !Chores.state.busy) editor(); return; }
