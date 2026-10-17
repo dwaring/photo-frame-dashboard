@@ -17,8 +17,9 @@
       '<span class="h-wx-icon">' + App.icon(w.cond, 60) + '</span>' +
       '<span class="h-wx-temp num">' + w.temp + '°</span>' +
       '<span class="h-wx-meta"><b>' + App.esc(w.label) + '</b>' + ('<span>Forecast H ' + w.hi + '°  L ' + w.lo + '°</span>') + '</span>' +
+      '<div class="h-wx-say">' + (w.summary ? '<b>' + App.esc(w.summary) + '.</b>' : '') +
+      (w.advice || '').split(' · ').filter(Boolean).map(function (line) { return '<span>' + App.esc(line) + '</span>'; }).join('') + '</div>' +
       '</div>' +
-      '<div class="h-wx-say">' + (w.summary ? '<b>' + App.esc(w.summary) + '.</b> ' : '') + App.esc(w.advice) + '.</div>' +
       (hours.length ? '' : '<small>Hourly forecast unavailable</small>') +
       '<div class="h-wx-hours">' + hours.map(function (h) {
         return '<div class="h-hr' + (h.p >= 50 ? ' is-wet' : '') + '"><span class="h-hr-l">' + h.label + '</span>' +
