@@ -103,13 +103,13 @@
 
   function cams() {
     return '<div class="label">Cameras · snapshots every 20s</div><div class="cams">' + D.cameras.slice(0, 2).map(function (c) {
-      return '<button class="cam" data-cam="' + c.id + '"><img src="' + App.img(c.seed, 400, 250) + '" alt=""><span class="cam-name">' + c.name + '</span><span class="cam-age">' + V.camAge + 's ago</span></button>';
+      return '<button class="cam" data-cam="' + c.id + '"><img src="' + App.placeholderImage() + '" alt=""><span class="cam-name">' + c.name + '</span><span class="cam-age">' + V.camAge + 's ago</span></button>';
     }).join('') + '</div>';
   }
 
   function media() {
     var m = D.media;
-    return '<img class="np-art" src="' + App.img(m.seed, 160, 160) + '" alt="">' +
+    return '<img class="np-art" src="' + App.placeholderImage() + '" alt="">' +
       '<div class="np-text"><span class="label">' + m.room + '</span><b>' + m.title + '</b><span>' + m.artist + '</span></div>' +
       '<button class="np-btn" data-play aria-label="Play/Pause">' + App.icon(m.playing ? 'pause' : 'play', 30) + '</button>';
   }
@@ -240,7 +240,7 @@
   };
 
   App.cameraSheet = function (c) {
-    App.sheet('<div class="cam-big"><img src="' + App.img(c.seed, 1200, 750) + '" alt=""><div class="cam-big-bar"><span class="tk-live"><i></i>' + c.name + '</span><span class="label label--light">Snapshot · ' + V.camAge + 's ago</span></div></div>', { cls: 'sheet--cam' });
+    App.sheet('<div class="cam-big"><img src="' + App.placeholderImage() + '" alt=""><div class="cam-big-bar"><span class="tk-live"><i></i>' + c.name + '</span><span class="label label--light">Snapshot · ' + V.camAge + 's ago</span></div></div>', { cls: 'sheet--cam' });
   };
 
   function listSheet(kind) {

@@ -74,8 +74,9 @@ labels. No weather API key is required. Browser time uses the device timezone
 
 Never put passwords, OAuth secrets, tokens, or private calendar URLs in browser
 config. Anything imported by Vite is delivered to the browser, even when ignored
-by Git. Personal photos belong in ignored dashboard/public/personal/ for local
-use; all public assets would be included by a future deployment.
+by Git. Imported photos for local display are copied into ignored `.private/photos/`
+using `npm run photos:sync-local` in dashboard/. Local API routes serve these
+copies; they are excluded from builds. Never place private photos in public assets.
 
 ## Implementation roadmap
 

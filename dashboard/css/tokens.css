@@ -18,7 +18,6 @@
   --ok: #00A36C;
   --warm: #FFC45C;
   --warm-rgb: 255 196 92;
-  --night: #D8321F;
 
   /* person colour defaults (overridden inline per element) */
   --c: var(--ink);

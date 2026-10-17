@@ -1,6 +1,6 @@
 # Google Photos manual imports
 
-Implemented, not yet connected or verified with a Google account. This imports a
+Hosted import connected and display verified. This imports a
 snapshot of up to 100 selected photos; additions to an album do not sync.
 Videos are skipped. A successful import replaces the previous selection.
 The shared household selection appears on Home, Photos and ambient mode.
@@ -54,8 +54,19 @@ do not delete images used by the current `manifest`. Expired `auth/` and `oauth/
 objects can also be removed. To remove all imported data, delete the bucket's
 objects and revoke the app in your Google account's third-party connections.
 
-Local Vite development continues to show labelled demo photos. OAuth/import is
-hosted only, so the Android tablet does not depend on the Mac.
+## Local display
+
+From `dashboard/`, run `npm run photos:sync-local` after changing the hosted
+selection. This downloads the imported selection from private R2 using your
+Wrangler account into ignored `.private/photos/`. The manifest is published
+locally only after all images download. Restart with `Start Dashboard.command`
+if the local server was already running when this feature was installed.
+Home, Photos and ambient mode use these local copies. No photos are bundled
+into builds. An empty selection displays “No photos imported”. Other unconnected
+image surfaces use a neutral “Not connected” placeholder.
+
+OAuth/import remains hosted; the Android tablet uses private hosted photos and
+does not depend on this local copy or the Mac.
 
 References: https://developers.google.com/photos/picker/guides/get-started-picker
 and https://developers.google.com/photos/picker/guides/media-items

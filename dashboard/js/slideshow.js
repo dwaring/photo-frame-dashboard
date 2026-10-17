@@ -4,10 +4,7 @@
   var D = window.DATA;
 
   function src(p, big) {
-    if (p.src) return p.src;
-    var w = p.o === 'p' ? 800 : 1600, h = p.o === 'p' ? 1200 : 1000;
-    if (!big) { w = Math.round(w / 2); h = Math.round(h / 2); }
-    return App.img(p.seed, w, h);
+    return p.src;
   }
   App.photoSrc = src;
 
@@ -147,7 +144,12 @@
 
   S.next = function () {
     var s = this.pick();
-    if (!s) return;
+    if (!s) {
+      this.current = null;
+      this.el.innerHTML = '<div class="slide" style="display:grid;place-items:center">No photos imported</div>';
+      this.restart();
+      return;
+    }
     if (this.current) this.history.push(this.current);
     this.render(s);
     this.restart();

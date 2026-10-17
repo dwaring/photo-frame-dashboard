@@ -50,6 +50,14 @@ The client, refresh token, and selected calendar ID remain in `.private/google-c
 
 Testing-mode Google OAuth refresh tokens for these scopes can expire after seven days; reconnect when required. For continued use, review Google's publishing requirements for your account/project.
 
+## Local connection verification
+
+On 17 October 2026, the local integration successfully synced 255 events and
+renewed its access token using the saved refresh token. The existing server
+refreshes access tokens automatically before expiry; reconnecting is only needed
+if Google expires or revokes authorization. Credentials and selection remain in
+ignored server-only storage.
+
 ## Behavior and limits
 
 - The selected shared calendar supplies calendar events throughout the dashboard; no sample calendar events are included.

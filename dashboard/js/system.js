@@ -3,8 +3,8 @@
   'use strict';
   var D = window.DATA, $ = App.$;
 
-  function img(seed, w, h) { return 'https://picsum.photos/seed/' + seed + '/' + w + '/' + h; }
-  App.img = img;
+  function placeholderImage() { return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250"><rect width="100%" height="100%" fill="#ddd8ce"/><text x="50%" y="50%" text-anchor="middle" fill="#555" font-family="sans-serif" font-size="18">Not connected</text></svg>'); }
+  App.placeholderImage = placeholderImage;
 
   // ------------------------------------------------------------ full-screen takeovers
   function takeover(html, cls) {
@@ -27,7 +27,7 @@
   App.doorbell = function () {
     var now = App.now();
     var el = takeover(
-      '<div class="tk-cam"><img src="' + img('visitor-porch', 1280, 800) + '" alt=""><span class="tk-live"><i></i>LIVE · Front Porch</span></div>' +
+      '<div class="tk-cam"><img src="' + placeholderImage() + '" alt=""><span class="tk-live"><i></i>LIVE · Front Porch</span></div>' +
       '<div class="tk-door">' +
       '  <div class="label label--light">' + App.icon('bell', 20) + ' Doorbell · ' + App.fmt.time(now) + '</div>' +
       '  <h1 class="serif tk-title">Someone’s at<br>the front door</h1>' +
@@ -122,10 +122,10 @@
       '<div class="demo-sec"><div class="label label--light">Time of day · now ' + App.fmt.time(t) + '</div><div class="demo-grid">' +
       '<button data-time="7:10">7:10 AM</button><button data-time="15:18">3:18 PM</button><button data-time="19:45">7:45 PM</button><button data-time="23:40">11:40 PM</button><button data-time="real">Real time</button></div></div>' +
       '<div class="demo-sec"><div class="label label--light">Modes</div><div class="demo-grid">' +
-      '<button data-mode="ambient">Ambient</button><button data-mode="night">Night</button><button data-fastidle>' + (App.idle.home < 60 ? 'Idle: fast ✓' : 'Idle: fast') + '</button></div></div>' +
+      '<button data-mode="ambient">Ambient</button><button data-fastidle>' + (App.idle.home < 60 ? 'Idle: fast ✓' : 'Idle: fast') + '</button></div></div>' +
       '<div class="demo-sec"><div class="label label--light">Alerts</div><div class="demo-grid">' +
       '<button data-alert="doorbell">Doorbell</button><button data-alert="leak">Water leak</button><button data-alert="garage">Garage open</button><button data-alert="package">Package</button></div></div>' +
-      '<p class="demo-note">Keyboard: <b>D</b> demo · <b>A</b> ambient · <b>N</b> night · <b>1–7</b> views</p>' +
+      '<p class="demo-note">Keyboard: <b>D</b> demo · <b>A</b> ambient · <b>1–7</b> views</p>' +
       '</div>';
   }
   App.openDemo = function () {
@@ -168,7 +168,6 @@
       var k = e.key.toLowerCase();
       if (k === 'd') { $('#demo').classList.contains('is-open') ? closeDemo() : App.openDemo(); }
       if (k === 'a') App.setMode('ambient');
-      if (k === 'n') App.setMode('night');
       if (k === 'escape') { closeDemo(); App.closeSheet(); }
       var views = ['home', 'calendar', 'tasks', 'shopping', 'photos', 'control', 'agents'];
       if (k >= '1' && k <= '7') App.go(views[+k - 1]);

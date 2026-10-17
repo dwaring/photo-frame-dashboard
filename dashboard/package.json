@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "photos:sync-local": "node scripts/sync-local-photos.js",
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "vite build && wrangler deploy",
