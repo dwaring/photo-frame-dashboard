@@ -99,7 +99,7 @@
   function chores() {
     var r = App.currentRoutine();
     var who = D.people.map(function (p) { return p.id; }).concat(['any']);
-    return '<div class="label">Chores · ' + r.name + '</div><p>' + App.esc(Chores.state.message) + '</p><div class="h-rings">' + who.map(function (id) {
+    return '<div class="label">Chores · ' + r.name + '</div><div class="h-rings">' + who.map(function (id) {
       var list = D.chores.filter(function (c) { return c.r === r.id && c.who === id; });
       if (!list.length) return '';
       var done = list.filter(function (c) { return c.done; }).length;

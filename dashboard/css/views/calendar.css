@@ -158,6 +158,8 @@
 .evs-leave { color: var(--ink); }
 .evs-leave b { font-weight: 800; }
 .evs-people { flex-direction: row !important; flex-wrap: wrap; gap: 8px; padding: 10px 0; }
+.evs-people .chip { color: var(--ink); }
+.evs-people .avatar { color: var(--c-ink); }
 .evs-notes { font-size: 28px; line-height: 1.2; padding-top: 22px; font-style: italic; }
 
 /* ---- add sheet + shared "who" pickers */
