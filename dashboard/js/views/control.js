@@ -240,7 +240,7 @@
   };
 
   App.cameraSheet = function (c) {
-    App.sheet('<div class="cam-big"><img src="' + App.placeholderImage() + '" alt=""><div class="cam-big-bar"><span class="tk-live"><i></i>' + c.name + '</span><span class="label label--light">Snapshot · ' + V.camAge + 's ago</span></div></div>', { cls: 'sheet--cam' });
+    App.sheet('<div class="cam-big"><img src="' + App.placeholderImage() + '" alt=""><div class="cam-big-bar"><span class="cam-status"><i></i>' + c.name + '</span><span class="label label--light">Snapshot · ' + V.camAge + 's ago</span></div></div>', { cls: 'sheet--cam' });
   };
 
   function listSheet(kind) {

@@ -101,6 +101,6 @@
 .sheet--cam .sheet-x { background: rgba(255, 255, 255, .2); color: #fff; }
 .cam-big { position: relative; }
 .cam-big img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
-.cam-big .tk-live { left: 20px; top: 20px; }
+.cam-big .cam-status { left: 20px; top: 20px; }
 .cam-big-bar .label { position: absolute; left: 24px; bottom: 20px; }
 .is-pulse { box-shadow: 0 0 0 6px var(--warm); }
