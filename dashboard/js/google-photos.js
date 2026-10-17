@@ -10,7 +10,7 @@
       if (App.photoImportVersion === data.importedAt) return;
       App.photoImportVersion = data.importedAt;
       window.DATA.photos = data.photos;
-      App.photoSourceLabel = 'Google Photos · manual import';
+      App.photoSourceLabel = 'Google Photos';
       App.emit('photos-updated');
       App.rerender();
     } catch (_) {
