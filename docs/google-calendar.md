@@ -1,9 +1,40 @@
-# Shared Google Calendar (Mac dashboard)
+# Shared Google Calendar
 
 This integration reads one selected Google calendar. It never writes Google events.
 Until a calendar is selected, the dashboard calendar is empty.
 
-## Google setup
+## Hosted setup
+
+The hosted Worker supports one read-only household calendar without the Mac.
+Visit `/api/google-calendar/setup` on your Cloudflare Access-protected dashboard.
+No date picker is required; the existing Calendar navigation stays in place.
+
+1. Enable Google Calendar API in the Google Cloud project used for Photos.
+2. Add these read-only scopes to Google Auth Platform data access:
+   `https://www.googleapis.com/auth/calendar.calendarlist.readonly` and
+   `https://www.googleapis.com/auth/calendar.events.readonly`.
+3. On the existing Photos web OAuth client, add the exact redirect URI
+   `https://YOUR-DASHBOARD-HOST/api/google-calendar/callback`.
+   Calendar reuses the hosted Photos client secrets by default. For a separate
+   client, set both `GOOGLE_CALENDAR_CLIENT_ID` and
+   `GOOGLE_CALENDAR_CLIENT_SECRET` with Wrangler interactive secret prompts.
+4. Deploy from `dashboard/` using `npm run deploy`.
+5. Open `/api/google-calendar/setup`, connect Google, grant read-only access,
+   and select the shared calendar. Return to the dashboard to sync.
+
+The entire hostname and callbacks must be protected by Cloudflare Access,
+with workers.dev and preview bypass URLs disabled. Any authorized household
+member can replace the shared connection. Tokens and selection remain under
+`calendar/` in the existing private PHOTOS R2 bucket; they never enter browser
+configuration. Photos imports are separate and do not delete Calendar records.
+A successful reconnection clears the selected calendar until you choose again.
+Google accounts in Testing may require reauthorization after seven days.
+Hosted sign-in, calendar selection and live rendering still require verification.
+To disconnect, delete `calendar/connection` from private R2 and revoke the
+Calendar app authorization in Google. Expired `calendar/oauth/` records can
+be deleted from R2.
+
+## Local Google setup
 
 1. In https://console.cloud.google.com/ create or choose a project and enable **Google Calendar API**.
 2. Configure **Google Auth Platform** branding and audience. For an external app in Testing, add the Google account with access to your shared calendar as a test user.

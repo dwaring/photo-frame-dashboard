@@ -37,7 +37,7 @@ Wrangler authentication is verified. The home-dashboard Worker now serves the
 built dashboard and fixed weather API routes using dashboard/wrangler.jsonc.
 Cloudflare Access redirects unauthenticated requests to sign-in. Authorized
 browser rendering and live weather behavior still require user verification;
-kiosk/browser setup is pending. Todoist is deployed and configured; hosted Google Calendar is not connected.
+kiosk/browser setup is pending. Todoist is deployed and configured; hosted Google Calendar OAuth and event routes are implemented; hosted connection and verification are pending.
 
 Current local Vite routes and Mac-side credential storage are development
 infrastructure, not a completed Android deployment. Calendar OAuth still needs a deployment-compatible backend. The BoM and
@@ -114,5 +114,5 @@ merging; device flashing scripts are outside this project's scope.
 Calendar selections; Todoist projects and Trello migration; photo source; household names; whether
 Spotify is for now-playing or playback control; shared shopping field
 mapping; hosted authentication; Android kiosk/browser setup and offline policy.
-Access-protected dashboard, weather, and Todoist routes are deployed; hosted calendar remains pending.
+Access-protected dashboard, weather, and Todoist routes are deployed; hosted calendar implementation is ready; Google callback configuration and account consent remain pending.
 An always-on Mac/home server is not a deployment option.

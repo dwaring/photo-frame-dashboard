@@ -1,8 +1,8 @@
 // Cloudflare Access protects the entire Worker, including its static assets.
-// Calendar OAuth remains unavailable until its hosted authorization exists.
 import { BOM_URL, FORECAST_URL } from '../server/bom.js';
 import { todoist } from './todoist.js';
 import { googlePhotos } from './google-photos.js';
+import { googleCalendar } from './google-calendar.js';
 
 function json(body, status = 200) {
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -13,6 +13,7 @@ export default {
     const path = new URL(request.url).pathname;
     if (path.startsWith('/api/todoist/')) return todoist(request, env);
     if (path.startsWith('/api/google-photos/')) return googlePhotos(request, env);
+    if (path.startsWith('/api/google-calendar/')) return googleCalendar(request, env);
     if (!path.startsWith('/api/')) return env.ASSETS.fetch(request);
     if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405);
     if (path === '/api/chatgpt/usage') {
@@ -24,9 +25,6 @@ export default {
       } catch {
         return json({ connected: false, reason: 'unavailable' }, 503);
       }
-    }
-    if (path === '/api/google-calendar/status') {
-      return json({ connected: false, selected: false });
     }
     const upstream = {
       '/api/weather/observations': BOM_URL,
