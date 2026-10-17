@@ -96,15 +96,17 @@
 .h-ring.is-done .ring-bg { fill: var(--c); }
 .h-ring.is-done .num { color: var(--c-ink); }
 
-.h-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.h-shop, .h-status { display: flex; flex-direction: column; gap: 4px; }
-.h-stat { display: flex; align-items: baseline; gap: 8px; }
+.h-shop.card { display: flex; flex-direction: column; gap: 12px; min-width: 0; overflow: hidden; text-align: left; }
+.h-shop-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.h-shop-link { display: flex; align-items: center; gap: 4px; font-size: 14px; color: var(--mute); white-space: nowrap; }
+.h-shop-body { display: flex; align-items: center; gap: 20px; flex: 1; min-height: 0; }
+.h-stat { display: flex; flex-direction: column; gap: 6px; flex: none; }
 .h-stat .num { font-size: 56px; line-height: .9; }
-.h-stat small { font-size: 16px; color: var(--mute); }
-.h-recent li { font-size: 16px; display: flex; align-items: center; gap: 8px; white-space: nowrap; overflow: hidden; line-height: 1.35; }
-.h-recent i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); flex: none; }
-.h-st-row { display: flex; align-items: center; gap: 8px; font-size: 17px; min-height: 30px; }
-.h-st-row b { font-size: 24px; }
-.h-st-row span { color: var(--ink-2); }
-.h-st-row.is-warn { color: #B45F00; font-weight: 800; }
-.h-st-row.is-warn span { color: inherit; }
+.h-stat small { font-size: 14px; color: var(--mute); }
+.h-recent { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 16px; flex: 1; min-width: 0; }
+.h-recent li { font-size: 17px; display: flex; align-items: center; gap: 7px; min-width: 0; line-height: 1.3; }
+.h-shop-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); flex: none; }
+.h-shop-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.h-shop-qty { font-size: 14px; color: var(--mute); white-space: nowrap; }
+.h-shop-empty { font-family: var(--serif); font-size: 22px; color: var(--mute); }
+.h-shop-sync { font-size: 13px; color: var(--mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

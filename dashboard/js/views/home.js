@@ -111,24 +111,16 @@
 
   function shopping() {
     var open = D.groceries.filter(function (g) { return !g.done; });
-    var recent = open.slice(-3).reverse();
-    return '<div class="label">Shopping</div>' +
-      '<div class="h-stat"><span class="num">' + open.length + '</span><small>items to get</small></div>' +
-      '<ul class="h-recent">' + recent.map(function (g) {
-        return '<li><i></i>' + App.esc(g.name) + '</li>';
-      }).join('') + '</ul>';
-  }
-
-  function status() {
-    var lights = D.devices.filter(function (d) { return d.type === 'light' && d.on; }).length;
-    var unlocked = D.devices.filter(function (d) { return d.type === 'lock' && !d.locked; });
-    var garage = D.devices.filter(function (d) { return d.type === 'garage'; })[0];
-    var secure = !unlocked.length && garage.state === 'closed';
-    var secText = secure ? 'All locked' : (garage.state !== 'closed' ? 'Garage open' : unlocked[0].name + ' unlocked');
-    return '<div class="label">Home</div>' +
-      '<div class="h-st-row">' + App.icon('bulb', 24) + '<b class="num">' + lights + '</b><span>lights on</span></div>' +
-      '<div class="h-st-row' + (secure ? '' : ' is-warn') + '">' + App.icon(secure ? 'lock' : 'unlock', 24) + '<span>' + secText + '</span></div>' +
-      '<div class="h-st-row">' + App.icon('thermo', 24) + '<b class="num">' + D.climate.current + '°</b><span>inside</span></div>';
+    var recent = open.slice(-6).reverse();
+    var connected = Shopping.state.connected;
+    return '<div class="h-shop-head"><span class="label">Shopping</span><span class="h-shop-link">' +
+      (open.length > recent.length ? '+' + (open.length - recent.length) + ' more · ' : '') + 'View list →</span></div>' +
+      '<div class="h-shop-body"><div class="h-stat"><span class="num">' + open.length + '</span><small>items to get</small></div>' +
+      (recent.length ? '<ul class="h-recent">' + recent.map(function (g) {
+        return '<li><span class="h-shop-dot"></span><span class="h-shop-name">' + App.esc(g.name) + '</span>' +
+          (g.qty > 1 ? '<b class="h-shop-qty">×' + g.qty + '</b>' : '') + '</li>';
+      }).join('') + '</ul>' : '<p class="h-shop-empty">' + (connected ? 'All stocked up.' : 'Connect shopping to see your list.') + '</p>') + '</div>' +
+      (!connected ? '<span class="h-shop-sync">' + App.esc(Shopping.state.message) + '</span>' : '');
   }
 
   function paint() {
@@ -140,7 +132,6 @@
     el.querySelector('.h-lanes').innerHTML = lanes();
     el.querySelector('.h-chores').innerHTML = chores();
     el.querySelector('.h-shop').innerHTML = shopping();
-    el.querySelector('.h-status').innerHTML = status();
   }
 
   function photoCaption(s) {
@@ -159,7 +150,7 @@
           '<div class="h-side">' +
           '  <button class="h-photo" data-go="photos"><div class="h-photo-stage"></div><div class="h-photo-cap"></div></button>' +
           '  <button class="h-chores card" data-go="tasks"></button>' +
-          '  <div class="h-duo"><button class="h-shop card" data-go="shopping"></button><button class="h-status card" data-go="control"></button></div>' +
+          '  <button class="h-shop card" data-go="shopping"></button>' +
           '</div></div>';
         el.addEventListener('click', function (e) {
           var ev = e.target.closest('[data-ev]');
