@@ -80,6 +80,7 @@
 .h-side { grid-column: 8 / 13; display: grid; grid-template-rows: 1fr 142px 150px; gap: 16px; min-height: 0; }
 .h-photo { position: relative; border-radius: var(--r); overflow: hidden; background: var(--paper-2); display: block; width: 100%; }
 .h-photo-stage { position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
+.h-photo-stage .slide--fit .fitimg { left: 0; width: 100%; transform: none; object-fit: cover; }
 .h-photo-cap {
   position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 18px 14px;
   background: linear-gradient(0deg, rgba(0, 0, 0, .6), rgba(0, 0, 0, 0));
