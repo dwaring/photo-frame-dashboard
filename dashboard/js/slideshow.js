@@ -30,11 +30,11 @@
     return a;
   }
 
-  function caption(ps, size) {
+  function caption(ps, o, size) {
     var m = App.photoMeta(ps[0]);
     return '<div class="cap cap--' + (size || 'l') + '">' +
       '<div class="cap-kicker">' + (m.onThisDay ? '<b>On this day</b> · ' : '') + m.kicker + (m.place ? ' · ' + App.esc(m.place) : '') + '</div>' +
-      '<div class="cap-date serif">' + (ps.length > 1 ? m.monthYear : m.date) + '</div>' +
+      (o.dates === false ? '' : '<div class="cap-date serif">' + (ps.length > 1 ? m.monthYear : m.date) + '</div>') +
       '</div>';
   }
   function kb(p, still) {
@@ -47,21 +47,21 @@
     cover: function (ps, o) {
       var p = ps[0];
       if (p.o === 'p') {
-        return '<div class="slide slide--fit"><img class="blurfill" src="' + src(p) + '" alt=""><img class="fitimg" src="' + src(p, true) + '" alt="">' + (o.captions ? caption(ps) : '') + '</div>';
+        return '<div class="slide slide--fit"><img class="blurfill" src="' + src(p) + '" alt=""><img class="fitimg" src="' + src(p, true) + '" alt="">' + (o.captions ? caption(ps, o) : '') + '</div>';
       }
-      return '<div class="slide slide--cover">' + kb(p) + (o.captions ? caption(ps) : '') + '</div>';
+      return '<div class="slide slide--cover">' + kb(p) + (o.captions ? caption(ps, o) : '') + '</div>';
     },
     pair: function (ps, o) {
-      return '<div class="slide slide--pair"><div class="pane">' + kb(ps[0], true) + '</div><div class="pane">' + kb(ps[1], true) + '</div>' + (o.captions ? caption(ps, 'm') : '') + '</div>';
+      return '<div class="slide slide--pair"><div class="pane">' + kb(ps[0], true) + '</div><div class="pane">' + kb(ps[1], true) + '</div>' + (o.captions ? caption(ps, o, 'm') : '') + '</div>';
     },
     collage: function (ps, o) {
-      return '<div class="slide slide--collage"><div class="pane pane--a">' + kb(ps[0], true) + '</div><div class="pane pane--b">' + kb(ps[1], true) + '</div><div class="pane pane--c">' + kb(ps[2], true) + '</div>' + (o.captions ? caption(ps, 'm') : '') + '</div>';
+      return '<div class="slide slide--collage"><div class="pane pane--a">' + kb(ps[0], true) + '</div><div class="pane pane--b">' + kb(ps[1], true) + '</div><div class="pane pane--c">' + kb(ps[2], true) + '</div>' + (o.captions ? caption(ps, o, 'm') : '') + '</div>';
     },
-    polaroid: function (ps) {
+    polaroid: function (ps, o) {
       var p = ps[0], m = App.photoMeta(p), rot = (Math.random() * 5 - 2.5).toFixed(1);
       return '<div class="slide slide--polaroid"><img class="blurfill" src="' + src(p) + '" alt="">' +
         '<figure class="polaroid polaroid--' + p.o + '" style="transform:rotate(' + rot + 'deg)"><div class="polaroid-img"><img src="' + src(p, true) + '" alt=""></div>' +
-        '<figcaption class="serif"><i>' + (m.place ? App.esc(m.place) + ', ' : '') + m.monthYear + '</i></figcaption></figure></div>';
+        (o.captions && (m.place || o.dates !== false) ? '<figcaption class="serif"><i>' + (m.place ? App.esc(m.place) : '') + (o.dates === false ? '' : (m.place ? ', ' : '') + m.monthYear) + '</i></figcaption>' : '') + '</figure></div>';
     }
   };
 
@@ -79,8 +79,7 @@
   var S = App.Slideshow.prototype;
 
   S.refill = function () {
-    var q = [];
-    D.photos.forEach(function (p) { q.push(p); if (p.fav) q.push(p); });
+    var q = D.photos.slice();
     // On-this-day photos always come first in a fresh cycle
     shuffle(q).sort(function (a, b) { return (App.photoMeta(b).onThisDay ? 1 : 0) - (App.photoMeta(a).onThisDay ? 1 : 0); });
     this.queue = q;
