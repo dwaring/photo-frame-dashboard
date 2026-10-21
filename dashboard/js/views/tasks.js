@@ -68,17 +68,25 @@
       '<div class="t-progress"><span class="num">' + done + '<small>/' + inR.length + '</small></span><div class="t-bar"><i style="width:' + (inR.length ? done / inR.length * 100 : 0) + '%"></i></div><span class="label">done</span></div>' +
       '<button class="ch-controls-toggle" data-toggle-controls aria-expanded="' + V.controlsOpen + '" aria-controls="chore-controls">' + (V.controlsOpen ? 'Hide controls' : 'Controls') + '</button>' +
       '</header>' +
-      '<div id="chore-controls" class="ch-controls"' + (V.controlsOpen ? '' : ' hidden') + '><input aria-label="Chore date" type="date" data-date value="' + date() + '"><span role="status">' + App.esc(Chores.state.message) + (V.editing ? ' · Tap a chore to edit' : '') + '</span><button data-refresh>Refresh</button><button data-edit>' + (V.editing ? 'Finish editing' : 'Edit chores') + '</button><button data-add>Add chore</button></div>' +
+      '<div id="chore-controls" class="ch-controls"' + (V.controlsOpen ? '' : ' hidden') + '><input aria-label="Chore date" type="date" data-date value="' + date() + '"><span role="status">' + App.esc(Chores.state.message) + (V.editing ? ' · Tap a chore to edit' : '') + '</span><button data-refresh>Refresh</button><button data-edit>' + (V.editing ? 'Finish editing' : 'Edit chores') + '</button><button data-add>Add chore</button><button data-celebration-preview>Preview celebration</button></div>' +
       '<div class="ch-lanes">' + LANES.map(function (w) { return lane(w, r); }).join('') + '</div>' +
       '</div>';
   }
 
   async function complete(c, btn, by) {
     if (V.pending[c.id]) return;
+    var completedDate = date(), slot = c.r, wasDone = c.done;
     V.pending[c.id] = true;
-    var ok = await Chores.change({ action: c.done ? 'reopen' : 'complete', id: c.taskId, person: c.who, r: c.r, date: date(), by: by || c.doneBy || c.who });
+    var ok = await Chores.change({ action: c.done ? 'reopen' : 'complete', id: c.taskId, person: c.who, r: slot, date: completedDate, by: by || c.doneBy || c.who });
     delete V.pending[c.id];
     render();
+    if (ok && !wasDone && completedDate === Chores.today() && ['harvey', 'frankie'].includes(c.who)) {
+      var remaining = Chores.forDate(completedDate).filter(function (x) { return x.who === c.who && x.r === slot; });
+      if (remaining.length && remaining.every(function (x) { return x.done; })) {
+        var r = D.routines.find(function (x) { return x.id === slot; });
+        Celebrations.reward(completedDate, c.who, slot, App.person(c.who).name, App.routineName(r, completedDate));
+      }
+    }
     if (ok) App.toast(App.esc(c.title) + (c.done ? ' reopened' : ' done'), { icon: 'check' });
   }
 
@@ -125,6 +133,7 @@
       V.el.querySelector('[data-toggle-controls]').focus();
       return;
     }
+    if (e.target.closest('[data-celebration-preview]')) { Celebrations.preview(); return; }
     if (e.target.closest('[data-refresh]')) { Chores.sync(); return; }
     if (e.target.closest('[data-edit]')) { V.editing = !V.editing; return render(); }
     if (e.target.closest('[data-add]')) { if (Chores.state.connected && !Chores.state.busy) editor(); return; }

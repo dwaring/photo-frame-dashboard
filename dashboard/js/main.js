@@ -10,6 +10,7 @@ import './slideshow.js';
 import './google-photos.js';
 import './todoist.js';
 import './chores.js';
+import './celebrations.js';
 import './views/home.js';
 import './views/calendar.js';
 import './views/tasks.js';

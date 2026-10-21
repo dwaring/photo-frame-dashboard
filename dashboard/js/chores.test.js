@@ -48,3 +48,46 @@ test('one shared Todoist task appears in both lanes with independent checkmarks'
   assert.equal(rows.find(c => c.who === 'harvey' && c.r === 'morning').done, true); assert.equal(rows.find(c => c.who === 'frankie').done, false);
   assert.equal(rows.find(c => c.who === 'harvey' && c.r === 'evening').done, false);
 });
+
+test('celebrates only a successfully completed child timeslot for today', async () => {
+  const views = {}, listeners = {}, rewards = [];
+  const day = '2026-10-16', routine = { id: 'morning', name: 'Morning', range: '6–11' };
+  const tasks = [1, 2].map(i => ({ id: String(i), taskId: String(i), title: 'Chore', who: 'harvey', r: 'morning', done: false }));
+  let succeeds = true;
+  const context = { window: { DATA: { routines: [routine] } }, Date,
+    Celebrations: { reward: (...args) => rewards.push(args) },
+    App: { register: (id, v) => views[id] = v, on() {}, currentRoutine: () => routine, routineName: r => r.name, esc: String, person: id => ({ name: id }), pstyle: () => '', avatar: () => '', ring: () => '', toast() {} },
+    Chores: { today: () => day, forDate: d => d === day ? tasks.map(t => ({ ...t })) : [], state: { connected: true, busy: false }, change: async body => { if (succeeds) tasks.find(t => t.id === body.id).done = body.action === 'complete'; return succeeds; } }
+  };
+  vm.runInNewContext(await readFile(new URL('./views/tasks.js', import.meta.url), 'utf8'), context);
+  views.tasks.show({ innerHTML: '', addEventListener: (e, f) => listeners[e] = f });
+  async function click(id) {
+    listeners.click({ target: { closest: selector => selector === '[data-ch]' ? { dataset: { ch: id } } : null } });
+    await new Promise(resolve => setImmediate(resolve));
+  }
+  await click('1'); assert.equal(rewards.length, 0);
+  succeeds = false; await click('2'); assert.equal(rewards.length, 0);
+  succeeds = true; await click('2'); assert.equal(rewards.length, 1);
+  assert.deepEqual(rewards[0], [day, 'harvey', 'morning', 'harvey', 'Morning']);
+  await click('2'); assert.equal(rewards.length, 1);
+});
+
+test('reward storage prevents replay after undo or reload and previews do not consume rewards', async () => {
+  const stored = {}, queued = [];
+  function load() {
+    const nodes = [];
+    const context = { window: {}, localStorage: { getItem: key => stored[key], setItem: (key, value) => stored[key] = value },
+      document: { createElement: () => ({ querySelector: () => ({}), remove() {} }), getElementById: () => ({ appendChild: el => nodes.push(el) }) },
+      setTimeout: fn => queued.push(fn), Math, Object, JSON };
+    vm.runInNewContext(source, context); return { api: context.window.Celebrations, nodes };
+  }
+  const source = await readFile(new URL('./celebrations.js', import.meta.url), 'utf8');
+  const first = load(); first.api.preview();
+  assert.equal(first.api.reward('2026-10-16', 'harvey', 'morning', 'Harvey', 'Morning'), true);
+  assert.equal(first.api.reward('2026-10-16', 'harvey', 'morning', 'Harvey', 'Morning'), false);
+  const second = load();
+  assert.equal(second.api.reward('2026-10-16', 'harvey', 'morning', 'Harvey', 'Morning'), false);
+  assert.equal(second.nodes.length, 0);
+  assert.equal(second.api.reward('2026-10-16', 'frankie', 'morning', 'Frankie', 'Morning'), true);
+  assert.equal(second.api.reward('2026-10-16', 'harvey', 'evening', 'Harvey', 'Evening'), true);
+});

@@ -1,0 +1,31 @@
+/* Transform/opacity animations keep the tablet's painting work small. */
+.celebration { position: absolute; inset: 0; z-index: 150; pointer-events: none; overflow: hidden; }
+.celebration::before { content: ""; position: absolute; inset: 0; background: rgb(24 32 44 / 70%); animation: celebration-backdrop 2.8s ease both; }
+.celebration-flight { position: absolute; left: 50%; top: 35%; width: 240px; height: 220px; animation: celebration-fly 2.8s ease-in-out both; }
+.celebration-flight svg { position: relative; width: 100%; height: 100%; animation: celebration-wiggle .45s ease-in-out infinite alternate; }
+.celebration-trail { position: absolute; right: 65%; top: 42%; width: 310px; height: 36px; border-radius: 50%; background: linear-gradient(#f392b2 0 25%, #ffda72 25% 50%, #97d3a7 50% 75%, #83cbdf 75%); opacity: .75; }
+.celebration--rocket .celebration-flight { animation-name: celebration-launch; }
+.celebration--rocket .celebration-trail, .celebration--dinosaur .celebration-trail { display: none; }
+.celebration--dinosaur .celebration-flight { top: 44%; animation-name: celebration-parade; }
+.celebration--dinosaur svg { animation: celebration-step .2s ease-in-out infinite alternate; }
+.celebration--star .celebration-flight { animation-name: celebration-shoot; }
+.celebration-message { position: absolute; top: 66%; left: 50%; transform: translateX(-50%); min-width: 340px; max-width: 85%; padding: 18px 32px; border-radius: 24px; background: #fff8e9; color: #303b48; box-shadow: 0 10px 40px #25334226; text-align: center; animation: celebration-message 2.8s ease both; }
+.celebration-message small, .celebration-message b, .celebration-message span { display: block; }
+.celebration-message small { text-transform: uppercase; letter-spacing: .12em; font-size: 12px; }
+.celebration-message b { font-size: 32px; margin: 3px 0; }
+.celebration-message span { font-size: 20px; }
+.celebration-sparks { position: absolute; left: 50%; top: 45%; }
+.celebration-sparks i { position: absolute; width: 10px; height: 15px; border-radius: 4px; background: var(--spark); animation: celebration-spark 2.8s ease-out both; }
+@keyframes celebration-backdrop { 0%,100% { opacity: 0; } 12%,88% { opacity: 1; } }
+@keyframes celebration-fly { 0% { transform: translate(-850px, 90px) rotate(-15deg); } 35%,65% { transform: translate(-120px, -35px) rotate(5deg); } 100% { transform: translate(850px,-160px) rotate(-12deg); } }
+@keyframes celebration-launch { 0% { transform: translate(-120px,700px) rotate(-10deg); } 35%,65% { transform: translate(-120px,-25px) rotate(8deg); } 100% { transform: translate(-80px,-650px) rotate(-10deg); } }
+@keyframes celebration-parade { 0% { transform: translate(-850px,0); } 35% { transform: translate(-160px,0); } 65% { transform: translate(-60px,0); } 100% { transform: translate(850px,0); } }
+@keyframes celebration-shoot { 0% { transform: translate(-850px,-300px) rotate(-30deg) scale(.5); } 35%,65% { transform: translate(-120px,-40px) rotate(10deg) scale(1); } 100% { transform: translate(850px,-400px) rotate(80deg) scale(.5); } }
+@keyframes celebration-wiggle { to { transform: rotate(-7deg) translateY(-8px); } }
+@keyframes celebration-step { to { transform: rotate(4deg) translateY(-12px); } }
+@keyframes celebration-message { 0%,12%,100% { opacity: 0; } 25%,85% { opacity: 1; } }
+@keyframes celebration-spark { 0%,28% { opacity: 0; transform: rotate(var(--angle)) translateX(20px); } 40% { opacity: 1; } 85%,100% { opacity: 0; transform: rotate(var(--angle)) translateX(var(--distance)) rotate(160deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .celebration-flight, .celebration-sparks { display: none; }
+  .celebration-message, .celebration::before { animation: none; }
+}
