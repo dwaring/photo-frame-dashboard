@@ -8,6 +8,9 @@
     stagePosition: style ? style.position : 'missing',
     cssFiles: document.styleSheets.length, assets: []
   };
+  var bounds = stage ? stage.getBoundingClientRect() : null;
+  report.viewport = { width: innerWidth, height: innerHeight, scrollX: pageXOffset, scrollY: pageYOffset };
+  if (bounds) report.stageBounds = { left: bounds.left, top: bounds.top, width: bounds.width, height: bounds.height };
   var tags = document.querySelectorAll('script[src],link[rel="stylesheet"]');
   Array.prototype.forEach.call(tags, function (tag) {
     var link = document.createElement('a');

@@ -1,4 +1,5 @@
 // Core shell: router, demo clock, idle/ambient, toasts, sheets, helpers.
+import { stageGeometry } from './stage-geometry.js';
 (function () {
   'use strict';
   var D = window.DATA;
@@ -279,10 +280,12 @@
   }
   App.resetIdle = function () { idleSec = 0; };
 
-  // ------------------------------------------------------------ stage scaling (desktop preview only)
+  // ------------------------------------------------------------ stage scaling (tablet and desktop)
   function fit() {
-    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 800);
-    $('#stage').style.transform = Math.abs(s - 1) < 0.01 ? '' : 'scale(' + s + ')';
+    var geometry = stageGeometry(window.innerWidth, window.innerHeight);
+    var stage = $('#stage');
+    stage.style.height = geometry.height + 'px';
+    stage.style.transform = 'scale(' + geometry.scale + ')';
   }
 
   // ------------------------------------------------------------ clock tick

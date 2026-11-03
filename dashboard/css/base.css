@@ -2,6 +2,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #0B0B0B; }
 body {
+  position: fixed; top: 0; right: 0; bottom: 0; left: 0; width: 100%;
   font-family: var(--sans);
   font-size: var(--fs-body);
   color: var(--ink);
@@ -37,13 +38,13 @@ ul { margin: 0; padding: 0; list-style: none; }
 .label--light { color: rgba(255, 255, 255, .72); }
 .label--on { color: var(--c-ink); opacity: .8; }
 
-/* ---------------------------------------------------------------- stage (fixed 1280×800) */
+/* ---------------------------------------------------------------- stage (1280×800 baseline; grows taller for 4:3 tablets) */
 .stage {
   position: absolute;
-  left: 50%; top: 50%;
+  left: 0; top: 0;
   width: 1280px; height: 800px;
-  margin: -400px 0 0 -640px;
-  transform-origin: 50% 50%;
+  margin: 0;
+  transform-origin: 0 0;
   background: var(--paper);
   overflow: hidden;
   display: grid;

@@ -32,6 +32,10 @@ static NSString *const DefaultURL = @"https://home-dashboard.darrenwaring.worker
     self.webView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:configuration];
     self.webView.navigationDelegate = self;
     self.webView.UIDelegate = self;
+    self.webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    self.webView.scrollView.contentInset = UIEdgeInsetsZero;
+    self.webView.scrollView.scrollIndicatorInsets = UIEdgeInsetsZero;
+    self.webView.scrollView.bounces = NO;
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.webView];
     [NSLayoutConstraint activateConstraints:@[
@@ -223,12 +227,23 @@ static NSString *const DefaultURL = @"https://home-dashboard.darrenwaring.worker
         if (self.maintenance) self.details.text = [@"Asset loading report:\n" stringByAppendingString:result];
     }];
 }
-- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation { [self setStatus:@"Loading…" visible:YES]; }
+- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
+    // Authentication/setup pages retain normal root scrolling.
+    webView.scrollView.scrollEnabled = YES;
+    [self setStatus:@"Loading…" visible:YES];
+}
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self cancelRetry];
     // Successful loads do not clear the rolling recovery budget (crash loops).
     [self setStatus:webView.URL.isFileURL ? @"Bundled test page loaded." : @"Remote page loaded; verify sign-in and integrations on screen." visible:NO];
     [self captureLoadingDiagnostics];
+    [webView evaluateJavaScript:@"!!window.App && !!document.getElementById('stage')" completionHandler:^(id result, NSError *error) {
+        if (!error && [result respondsToSelector:@selector(boolValue)] && [result boolValue]) {
+            // Lock only the document's native scroll view; CSS overflow panels stay interactive.
+            webView.scrollView.scrollEnabled = NO;
+            [webView.scrollView setContentOffset:CGPointZero animated:NO];
+        }
+    }];
 }
 - (void)showError:(NSError *)error {
     if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled) return;
