@@ -63,7 +63,7 @@
 /* climate */
 .hc-climate { background: var(--ink); color: #fff; border-radius: var(--r); padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
 .th-main { display: flex; align-items: center; justify-content: space-between; }
-.th-btn { width: 84px; height: 84px; border-radius: 50%; background: rgba(255, 255, 255, .12); display: grid; place-items: center; }
+.th-btn { width: 84px; height: 84px; border-radius: 50%; background: rgba(255, 255, 255, .12); display: flex; align-items: center; justify-content: center; }
 .th-btn:active { transform: scale(.9); background: rgba(255, 255, 255, .25); }
 .th-set { text-align: center; }
 .th-set .num { font-size: 116px; line-height: .8; letter-spacing: -.03em; display: block; }
@@ -88,13 +88,13 @@
 .np-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .np-text b { font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .np-text > span:last-child { font-size: 16px; color: var(--mute); }
-.np-btn { width: var(--tap); height: var(--tap); border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; }
+.np-btn { width: var(--tap); height: var(--tap); border-radius: 50%; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; }
 
 /* garage slide-to-confirm */
 .slide-confirm { position: relative; height: 88px; border-radius: 999px; background: var(--paper-2); overflow: hidden; touch-action: none; }
-.sc-label { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: grid; place-items: center; font-size: 20px; font-weight: 800; font-stretch: 80%; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding-left: 60px; }
+.sc-label { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; font-stretch: 80%; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding-left: 60px; }
 .sc-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 88px; border-radius: 999px; background: var(--amber); }
-.sc-knob { position: absolute; left: 6px; top: 6px; width: 76px; height: 76px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; box-shadow: 0 6px 16px rgba(0, 0, 0, .25); }
+.sc-knob { position: absolute; left: 6px; top: 6px; width: 76px; height: 76px; border-radius: 50%; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(0, 0, 0, .25); }
 
 /* camera sheet */
 .sheet--cam { width: 1000px; background: #000; }

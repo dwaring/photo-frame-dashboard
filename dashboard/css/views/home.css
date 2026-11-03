@@ -27,7 +27,7 @@
 .h-wx-hours { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); column-gap: 6px; margin-top: 4px; }
 .h-hr { display: grid; grid-template-rows: 18px 26px 20px; justify-items: center; align-items: center; row-gap: 4px; min-width: 0; font-size: 16px; }
 .h-hr-l { font-size: 13px; line-height: 1; white-space: nowrap; font-weight: 700; color: var(--mute); text-transform: uppercase; }
-.h-hr-i { height: 26px; display: grid; place-items: center; }
+.h-hr-i { height: 26px; display: flex; align-items: center; justify-content: center; }
 .h-hr b { font-weight: 800; font-stretch: 70%; }
 .h-hr.is-wet .h-hr-i { color: #1F6FEB; }
 
@@ -92,7 +92,7 @@
 .h-chores { display: flex; flex-direction: column; gap: 8px; }
 .h-rings { display: flex; justify-content: space-between; }
 .h-ring { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.h-ring .num { position: absolute; top: 0; left: 0; width: 64px; height: 64px; display: grid; place-items: center; font-size: 20px; }
+.h-ring .num { position: absolute; top: 0; left: 0; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; white-space: nowrap; line-height: 1; font-size: 20px; }
 .h-ring span { font-size: var(--fs-min); font-weight: 700; color: var(--ink-2); }
 .h-ring.is-done .ring-bg { fill: var(--c); }
 .h-ring.is-done .num { color: var(--c-ink); }

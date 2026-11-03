@@ -89,7 +89,7 @@ button.card:active, .h-hero:active, .h-photo:active { transform: scale(.985); }
 
 .avatar {
   flex: none;
-  display: inline-grid; place-items: center;
+  display: inline-flex; align-items: center; justify-content: center;
   border-radius: 50%;
   background: var(--c); color: var(--c-ink);
   font-weight: 900; font-stretch: 70%; line-height: 1;
@@ -110,15 +110,16 @@ button.card:active, .h-hero:active, .h-photo:active { transform: scale(.985); }
 .btn--ghost { background: transparent; }
 .is-hidden { visibility: hidden; }
 
+/* Flex centers button contents reliably in the iOS 12 WebView. */
 .icon-btn {
   width: var(--tap); height: var(--tap); flex: none;
-  display: grid; place-items: center;
+  display: flex; align-items: center; justify-content: center;
   border-radius: 50%; border: 2px solid var(--line);
 }
 .icon-btn:active { background: var(--paper-2); }
 .fab {
   width: 72px; height: 72px; flex: none;
-  display: grid; place-items: center;
+  display: flex; align-items: center; justify-content: center;
   border-radius: 50%; background: var(--ink); color: var(--paper);
 }
 .fab:active { transform: scale(.9); }
@@ -202,7 +203,7 @@ button.card:active, .h-hero:active, .h-photo:active { transform: scale(.985); }
 .sheet-x {
   position: absolute; right: 14px; top: 14px; z-index: 2;
   width: var(--tap); height: var(--tap); border-radius: 50%;
-  display: grid; place-items: center; background: rgba(0, 0, 0, .08);
+  display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .08);
 }
 .sheet-pad { padding: 34px 36px 32px; }
 .sheet-h { font-size: 52px; line-height: 1; margin: 6px 0 22px; }
@@ -230,7 +231,7 @@ button.card:active, .h-hero:active, .h-photo:active { transform: scale(.985); }
 .demo.is-open .demo-panel { transform: none; }
 .demo-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
 .demo-head h2 { font-size: 44px; line-height: 1; }
-.demo-x { width: var(--tap); height: var(--tap); border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, .1); }
+.demo-x { width: var(--tap); height: var(--tap); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, .1); }
 .demo-sec { margin-bottom: 22px; }
 .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .demo-grid button {

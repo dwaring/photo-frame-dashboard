@@ -19,7 +19,7 @@
 .ch-ring { position: relative; width: 46px; height: 46px; flex: none; }
 .ch-ring .ring-bg { stroke: rgba(255, 255, 255, .3); }
 .ch-ring .ring-fg { stroke: var(--c-ink); }
-.ch-ring .num { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: grid; place-items: center; font-size: 15px; }
+.ch-ring .num { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap; line-height: 1; font-size: 15px; }
 
 .ch-list { flex: 1; min-height: 0; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
 .ch {
@@ -31,7 +31,7 @@
 .ch:active { transform: scale(.97); }
 .ch-emoji {
   position: relative; width: 54px; height: 54px; border-radius: 14px; flex: none;
-  display: grid; place-items: center; font-size: 30px;
+  display: flex; align-items: center; justify-content: center; font-size: 30px;
   background: rgba(var(--c-rgb), .14); box-shadow: inset 0 0 0 2px rgba(var(--c-rgb), .35);
 }
 .ch-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -41,7 +41,7 @@
 .ch.is-overdue { box-shadow: inset 0 0 0 2px var(--alert); }
 .ch-check {
   position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-radius: 14px;
-  display: grid; place-items: center;
+  display: flex; align-items: center; justify-content: center;
   background: var(--c); opacity: 0; transform: scale(.6);
 }
 .ch-check svg { fill: none; stroke: var(--c-ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; }
