@@ -28,6 +28,25 @@ Personal starting branch: personal-dashboard. Main tracks the upstream baseline.
 
 ## Deployment scope
 
+An additional iOS kiosk experiment is being initialized in `ios-kiosk/` for an
+iPad mini 3 (iPad4,7), iOS 12.5.8, using Objective-C/UIKit/WKWebView. This expands
+the original Android deployment scope without changing the hosted dashboard.
+On 2026-11-03 Xcode 15.4 (15F31d) successfully built the ARM64 wrapper with
+minimum OS 12.0 and SDK 17.5 on this Mac. Xcode 27.2's SDK minimum is 15.0 and
+is not used. USB-only SSH, on-device ldid signing and path-specific uicache
+registration succeeded. The user verified app launch, bundled test rendering,
+JavaScript and touch. Version 0.2 adds kiosk controls and was installed with a
+rollback copy; individual controls and runtime data-container behavior still
+need device verification. No jailbreak packages, reboot or respring were needed.
+Cloudflare-account login stalled after selecting the Cloudflare identity provider.
+With explicit user approval, a hostname-specific owner-email/PIN Access app with
+a 24-hour session was added; the original Worker-wide protection was retained.
+An unauthenticated check using the iPad user-agent returns the email-code form.
+PIN completion and authenticated dashboard rendering on the iPad remain pending.
+The wrapper does not upgrade iOS WebKit. See `ios-kiosk/README.md` for build,
+installation, maintenance controls, rollback and remaining checks. No web
+deployment or repository push was performed.
+
 The tablet must operate without the development machine. Internet access is
 required for live shared-service sync; independent operation does not mean
 fully offline operation. Prefer a hosted web dashboard with a small authenticated
