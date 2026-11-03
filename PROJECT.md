@@ -50,7 +50,7 @@ handling are not implemented.
 Todoist is the selected single source for groceries, recurring chores, and home
 projects. Trello is being superseded; its existing home board must be retained
 until migration is verified. The separate Trello groceries board was prepared
-but never connected to the dashboard. Woolworths and Amazon are the shopping
+but never connected to the dashboard. Woolies, ALDI, and Amazon are the shopping
 stores. The Shopping project has been identified. A hosted Todoist API adapter supports read sync, add, complete, quantity, and add-back actions. A separate Shopping usuals project supplies reusable quick-add tiles; the original shopping layout and store/category controls are restored. Worker secrets are installed and a live read succeeded; live adapter mutations have also passed; authenticated hosted UI verification remains pending. Trello migration is not verified. See docs/todoist.md.
 Apple Notes/Reminders via a Mac helper does not meet the independent-tablet
 requirement.

@@ -24,10 +24,11 @@ window.DATA = (function () {
   var week = {};
 
   // ---------------------------------------------------------------- shopping
-  var stores = [{ id: 'grocer', name: 'Woolworths' }, { id: 'amazon', name: 'Amazon' }];
+  var stores = [{ id: 'grocer', name: 'Woolies' }, { id: 'aldi', name: 'ALDI' }, { id: 'amazon', name: 'Amazon' }];
   var catOrder = {
     all: ['Produce', 'Bakery', 'Meat & Fish', 'Dairy & Eggs', 'Pantry', 'Frozen', 'Snacks', 'Household'],
     grocer: ['Produce', 'Bakery', 'Meat & Fish', 'Dairy & Eggs', 'Pantry', 'Frozen', 'Snacks', 'Household'],
+    aldi: ['Produce', 'Bakery', 'Meat & Fish', 'Dairy & Eggs', 'Pantry', 'Frozen', 'Snacks', 'Household'],
     amazon: ['Household', 'Pantry', 'Snacks', 'Dairy & Eggs', 'Meat & Fish', 'Frozen', 'Produce', 'Bakery']
   };
   var gid = 0;

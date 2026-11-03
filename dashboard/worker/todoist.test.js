@@ -106,3 +106,18 @@ test('staple templates and unrelated tasks cannot be completed, reopened, or cha
     for (const action of ['complete', 'reopen', 'quantity']) assert.equal((await todoist(request('POST', { action, id: 'item', qty: 2 }), env)).status, 403);
   } finally { globalThis.fetch = original; }
 });
+
+test('adding ALDI coffee keeps its store separate from Woolies', async () => {
+  assert.equal(displayTask({ content: 'Coffee Beans', labels: ['ALDI'] }).store, 'aldi');
+  const original = globalThis.fetch;
+  let added;
+  globalThis.fetch = async (url, options) => {
+    if (options.method === 'GET') return Response.json({ results: [{ id: 'other', content: 'Coffee Beans' }], next_cursor: null });
+    added = JSON.parse(options.body);
+    return Response.json({ id: 'new' });
+  };
+  try {
+    assert.equal((await todoist(request('POST', { action: 'add', name: 'Coffee Beans', store: 'aldi' }), env)).status, 200);
+    assert.deepEqual(added.labels, ['aldi']);
+  } finally { globalThis.fetch = original; }
+});

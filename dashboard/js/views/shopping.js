@@ -24,7 +24,7 @@
       (q ? '<button class="s-ac-row s-ac-row--new" data-add' + disabled() + '><b>Add “' + App.esc(draft.trim()) + '”</b>' + App.icon('plus', 26) + '</button>' : '');
   }
   function row(t) {
-    return '<div class="s-row' + (pending[t.id] ? ' is-checking' : '') + '"><button class="s-hit" data-check="' + App.esc(t.id) + '"' + disabled(t.uncompletable) + ' aria-label="Check off ' + App.esc(t.name) + '"><span class="s-box">' + App.icon('check', 22) + '</span><span class="s-name"><b>' + App.esc(t.name) + '</b>' + (t.note ? '<small>' + App.esc(t.note) + '</small>' : '') + '</span>' + (store === 'all' && t.store === 'amazon' ? '<span class="s-store">Amazon</span>' : '') + '</button>' +
+    return '<div class="s-row' + (pending[t.id] ? ' is-checking' : '') + '"><button class="s-hit" data-check="' + App.esc(t.id) + '"' + disabled(t.uncompletable) + ' aria-label="Check off ' + App.esc(t.name) + '"><span class="s-box">' + App.icon('check', 22) + '</span><span class="s-name"><b>' + App.esc(t.name) + '</b>' + (t.note ? '<small>' + App.esc(t.note) + '</small>' : '') + '</span>' + (store === 'all' && t.store !== 'grocer' ? '<span class="s-store">' + App.esc(DATA.stores.find(function (s) { return s.id === t.store; }).name) + '</span>' : '') + '</button>' +
       '<div class="s-qty"><button data-qty="-1" data-id="' + App.esc(t.id) + '" aria-label="Less ' + App.esc(t.name) + '"' + disabled(t.uncompletable || pending[t.id] || t.qty <= 1) + '>' + App.icon('minus', 22) + '</button><span class="num">' + t.qty + '</span><button data-qty="1" data-id="' + App.esc(t.id) + '" aria-label="More ' + App.esc(t.name) + '"' + disabled(t.uncompletable || pending[t.id] || t.qty >= 999) + '>' + App.icon('plus', 22) + '</button></div></div>';
   }
   function render() {

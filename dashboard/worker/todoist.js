@@ -3,7 +3,7 @@ const json = (body, status = 200) => Response.json(body, { status, headers: { 'C
 export function displayTask(t) {
   const match = /\s+×([1-9]\d{0,2})$/.exec(t.content);
   return { id: t.id, name: match ? t.content.slice(0, match.index) : t.content, qty: match ? Number(match[1]) : 1,
-    store: (t.labels || []).some(l => l.toLowerCase() === 'amazon') ? 'amazon' : 'grocer',
+    store: (t.labels || []).some(l => l.toLowerCase() === 'amazon') ? 'amazon' : (t.labels || []).some(l => l.toLowerCase() === 'aldi') ? 'aldi' : 'grocer',
     note: t.description || '', uncompletable: !!t.is_uncompletable, recurring: !!t.due?.is_recurring };
 }
 export async function todoist(request, env) {
@@ -48,12 +48,12 @@ export async function todoist(request, env) {
       }
       if (!content || content.length > 500) return json({ error: 'Invalid item name' }, 400);
       // Add once. A repeated tap does not create duplicate tasks.
-      const store = body.store === 'amazon' ? 'amazon' : body.store === 'grocer' ? 'grocer' : displayTask({ content, labels }).store;
+      const store = ['amazon', 'aldi', 'grocer'].includes(body.store) ? body.store : displayTask({ content, labels }).store;
       const name = displayTask({ content }).name.toLowerCase();
       const existing = (await list(env.TODOIST_PROJECT_ID)).map(displayTask).find(t => t.name.toLowerCase() === name && t.store === store);
       if (existing) return json({ ok: true, alreadyOnList: true });
-      labels = (labels || []).filter(l => !['amazon', 'woolworths'].includes(l.toLowerCase()));
-      if (store === 'amazon') labels.push('amazon');
+      labels = (labels || []).filter(l => !['amazon', 'aldi', 'woolworths', 'woolies'].includes(l.toLowerCase()));
+      if (store !== 'grocer') labels.push(store);
       await api('tasks', { content, project_id: env.TODOIST_PROJECT_ID, ...(description ? { description } : {}), ...(labels.length ? { labels } : {}) });
     } else if (['complete', 'reopen', 'quantity'].includes(body.action) && /^[a-zA-Z0-9]+$/.test(body.id || '')) {
       const task = await api('tasks/' + body.id);

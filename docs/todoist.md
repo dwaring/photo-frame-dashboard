@@ -38,8 +38,8 @@ item first. Simultaneous requests from different devices can still race.
 The shopping screen retains the original two-column layout, category grouping,
 store filters, quantity buttons, suggestions from your usuals, and quick add.
 Quantities use a trailing ` ×2` in the Todoist task title (1–999); other title text
-and descriptions are preserved. The `amazon` label selects Amazon; otherwise
-items default to Woolworths. Adding with a store filter applies that store.
+and descriptions are preserved. The `amazon` label selects Amazon and `aldi` selects ALDI; otherwise
+items default to Woolies. Adding with a store filter applies that store.
 With All selected, a usual item keeps its own store. Category groups are inferred
 from the built-in grocery vocabulary; unmatched items appear under Other.
 
