@@ -8,6 +8,22 @@ function fixture() {
   const req = (path, init = {}) => new Request(origin + '/api/google-calendar/' + path, { ...init, headers: { 'Cf-Access-Jwt-Assertion': 'test', 'Cf-Access-Authenticated-User-Email': 'test@example.com', ...init.headers } });
   return { data, env, req };
 }
+test('expired consent and Calendar permission errors have safe, distinct codes', async () => {
+  const original = globalThis.fetch;
+  try {
+    for (const [expired, expected] of [[true, 'reauthorization-required'], [false, 'calendar-access-denied']]) {
+      const { env, req, data } = fixture();
+      data.set('calendar/connection', JSON.stringify({ access_token: 'test-token', refresh_token: 'test-refresh', expires: expired ? 0 : Date.now() + 3600000, selected: { id: 'shared' } }));
+      globalThis.fetch = async () => Response.json({ error: 'invalid_grant', error_description: 'private-provider-detail' }, { status: expired ? 400 : 403 });
+      const response = await googleCalendar(req('events'), env);
+      const body = await response.json();
+      assert.equal(response.status, 502);
+      assert.equal(body.code, expected);
+      assert.ok(!JSON.stringify(body).includes('private-provider-detail'));
+      assert.ok(data.has('calendar/connection'), 'failed refresh must preserve the connection and selection');
+    }
+  } finally { globalThis.fetch = original; }
+});
 test('Access and same-origin checks precede private storage', async () => {
   const { env, req } = fixture();
   assert.equal((await googleCalendar(new Request(origin + '/api/google-calendar/status'), env)).status, 401);

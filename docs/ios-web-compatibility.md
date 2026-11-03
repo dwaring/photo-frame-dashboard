@@ -64,6 +64,28 @@ display grid / position absolute. This verifies the asset loading/activation
 failure was corrected; complete visual layout confirmation is still pending.
 No Access policy was weakened or changed.
 
+## Viewport and document scrolling
+
+The user then confirmed styling and partial functionality, but reported an
+offset, scrollable canvas. The old layout explicitly centered a 1280×800 stage
+and used a fixed-width mobile viewport. The page now uses device-width, anchors
+the scaled stage at (0,0), fixes the document body, and expands the stage's
+logical height for taller aspect ratios. The 1024×768 iPad therefore fills both
+axes without cropping or a top/left letterbox. Uniform scaling and the 1280px
+design width keep existing touch-coordinate calculations valid.
+
+Home Kiosk 0.4 removes automatic native scroll insets and bounce. Once the
+dashboard is detected, it resets and locks only the outer WKWebView scroll view;
+authentication pages retain normal root scrolling. CSS overflow panels remain
+enabled; individual widget scrolling still needs touch verification.
+
+Built, tested across viewport sizes, deployed as
+`b0d52012-acd8-4554-a988-5baa887613f8`, and installed with a rollback copy.
+The user confirmed **top-left and fixed**. The actual device report verified
+viewport 1024×768, stage bounds left 0 / top 0 / width 1024 / height 768,
+and document scroll offsets 0 / 0. The current assets load and the bundle syntax
+is accepted by the running iPad WebView.
+
 After deployment, reload the configured
 dashboard in Home Kiosk and inspect Today, Calendar, Chores, Shopping, Photos
 and Agents. Verify only the selected view is visible, touch navigation works,

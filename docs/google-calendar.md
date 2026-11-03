@@ -29,7 +29,12 @@ member can replace the shared connection. Tokens and selection remain under
 configuration. Photos imports are separate and do not delete Calendar records.
 A successful reconnection clears the selected calendar until you choose again.
 Google accounts in Testing may require reauthorization after seven days.
-Hosted sign-in, calendar selection and live rendering still require verification.
+On 3 November 2026, the iPad authenticated successfully and the hosted status
+confirmed a configured connection and selected calendar. Event retrieval returned
+HTTP 502; the exact Google failure and restored live rendering remain under
+investigation. The Calendar view now displays sync failures and a setup link
+when reconnection or permissions need attention, rather than silently showing
+an empty schedule.
 To disconnect, delete `calendar/connection` from private R2 and revoke the
 Calendar app authorization in Google. Expired `calendar/oauth/` records can
 be deleted from R2.

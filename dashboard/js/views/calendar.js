@@ -202,7 +202,11 @@
 
   function render() {
     var body = { day: dayView, '3day': threeDay, week: weekView, month: monthView }[V.mode]();
-    V.el.innerHTML = '<div class="cal cal--' + V.mode + '">' + header() + '<div class="cal-body">' + body + '</div></div>';
+    var calendar = D.calendar || { label: 'Google · Not connected', setupRequired: true };
+    var status = '<div class="cal-sync" role="status"><span>' + App.esc(calendar.label) + '</span>' +
+      (calendar.setupRequired ? '<a href="/api/google-calendar/setup">Calendar setup</a>' : '') +
+      '<button data-cal-sync>Refresh</button></div>';
+    V.el.innerHTML = '<div class="cal cal--' + V.mode + '">' + header() + status + '<div class="cal-body">' + body + '</div></div>';
     var sc = V.el.querySelector('.grid-scroll');
     if (sc) {
       var now = App.now();
@@ -220,6 +224,7 @@
 
   function onClick(e) {
     var t;
+    if (e.target.closest('[data-cal-sync]')) { if (App.syncCalendar) App.syncCalendar(); return; }
     if ((t = e.target.closest('[data-ev]'))) return App.eventSheet(App.findEvent(t.dataset.ev));
     if ((t = e.target.closest('[data-more]'))) return moreSheet(t.dataset.more.split(','));
     if ((t = e.target.closest('[data-nav]'))) return nav(+t.dataset.nav);

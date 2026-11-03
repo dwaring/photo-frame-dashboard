@@ -57,6 +57,11 @@ same-origin asset tags to use-credentials, as required by Cloudflare Access;
 deployed as 46987981-c213-4739-bf4a-14b592d1d916. The next device report confirmed
 App present, 614 readable CSS rules and the intended grid/absolute stage layout.
 Complete visual confirmation remains pending. See docs/ios-web-compatibility.md.
+The subsequent top-left/scroll correction was deployed as
+b0d52012-acd8-4554-a988-5baa887613f8 with Home Kiosk 0.4 installed. The user
+confirmed the dashboard is top-left and fixed; device geometry verified exact
+1024×768 bounds at (0,0) and zero document scroll offsets. Individual widgets
+and long-running kiosk behavior remain to be verified.
 The wrapper does not upgrade iOS WebKit. See `ios-kiosk/README.md` for build,
 installation, maintenance controls, rollback and remaining checks. No web
 deployment or repository push was performed.

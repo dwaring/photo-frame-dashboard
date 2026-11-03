@@ -7,6 +7,7 @@ const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosnif
 const json = (body, status = 200) => Response.json(body, { status, headers });
 const cookie = (state, age = 600) => 'calendar_state=' + state + '; Secure; HttpOnly; SameSite=Lax; Path=' + root + '; Max-Age=' + age;
 const redirect = (location, value) => new Response(null, { status: 303, headers: { ...headers, Location: location, ...(value ? { 'Set-Cookie': value } : {}) } });
+const failure = (message, code) => Object.assign(new Error(message), { code });
 const page = body => new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Google Calendar setup</title><style>body{font:18px system-ui;max-width:720px;margin:40px auto;padding:24px}label{display:block;margin:16px 0}button,a{display:inline-block;padding:12px;margin:8px 0}</style><h1>Shared Google Calendar</h1>' + body + '<p><a href="/">Back to dashboard</a></p>', { headers: { ...headers, 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'" } });
 function people(title = '') {
   const names = ['darren', 'nadine', 'harvey', 'frankie'];
@@ -27,7 +28,10 @@ export async function googleCalendar(request, env) {
   const callback = url.origin + root + '/callback';
   async function exchange(params, previous = {}) {
     const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', body: new URLSearchParams({ client_id: clientId, client_secret: clientSecret, ...params }), signal: AbortSignal.timeout(15000) });
-    if (!r.ok) throw Error('Google authorization failed. Reconnect your Google account.');
+    if (!r.ok) {
+      let detail; try { detail = await r.json(); } catch {}
+      throw failure('Google authorization failed. Reconnect your Google account.', detail?.error === 'invalid_grant' ? 'reauthorization-required' : 'google-oauth-failed');
+    }
     const t = await r.json();
     if (!t.access_token || !(t.refresh_token || previous.refresh_token)) throw Error('Offline authorization missing. Reconnect your Google account.');
     return { access_token: t.access_token, refresh_token: t.refresh_token || previous.refresh_token, expires: Date.now() + t.expires_in * 1000 };
@@ -41,7 +45,7 @@ export async function googleCalendar(request, env) {
       await save('connection', auth);
     }
     const r = await fetch('https://www.googleapis.com/calendar/v3/' + path + '?' + new URLSearchParams(query), { headers: { Authorization: 'Bearer ' + auth.access_token }, signal: AbortSignal.timeout(20000) });
-    if (!r.ok) throw Error('Google Calendar request failed. Reconnect or try again.');
+    if (!r.ok) throw failure('Google Calendar request failed. Reconnect or try again.', r.status === 401 ? 'reauthorization-required' : r.status === 403 ? 'calendar-access-denied' : 'calendar-api-failed');
     return r.json();
   }
   async function pages(path, query) {
@@ -99,7 +103,7 @@ export async function googleCalendar(request, env) {
     }
     return json({ error: 'Unknown calendar route' }, 404);
   } catch (e) {
-    if (route === '/status' || route === '/events') return json({ error: e.message }, 502);
+    if (route === '/status' || route === '/events') return json({ error: e.message, code: e.code || 'calendar-unavailable' }, 502);
     return page('<p>' + esc(e.message) + '</p><a href="' + root + '/connect">Reconnect Google account</a><p><a href="' + root + '/setup">Calendar setup</a></p>');
   }
 }

@@ -90,6 +90,14 @@ shared `/var/mobile` data or change bootstrap packages for rollback.
 
 ## Kiosk controls
 
+Version 0.4 disables automatic native content-inset adjustment and outer bounce.
+After detecting the dashboard it resets the outer WebView scroll offset and
+locks that document scroll view. Auth/setup pages retain scrolling; nested HTML
+overflow panels are not disabled. With the matching web viewport update the user
+confirmed top-left/fixed behavior. Device diagnostics verified stage (0,0),
+1024×768 size and document scroll offsets (0,0). Individual widget scrolling
+and other kiosk controls still need device testing.
+
 Version 0.3 adds an asset-loading diagnostic after the user reported an unstyled
 dashboard after deployment. On dashboard page completion it records only document
 readiness, whether App exists, stage display/position, stylesheet count, and

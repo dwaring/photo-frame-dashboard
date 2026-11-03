@@ -11,6 +11,9 @@
 .cal-title .serif { font-size: 34px; line-height: 1; white-space: nowrap; }
 .cal-head [data-today] { margin-right: auto; }
 .cal-body { flex: 1; min-height: 0; position: relative; }
+.cal-sync { display: flex; align-items: center; flex: none; min-height: 30px; margin-bottom: 8px; font-size: 15px; color: var(--mute); }
+.cal-sync a, .cal-sync button { margin-left: 20px; color: var(--ink); text-decoration: underline; }
+.cal-sync button { margin-left: auto; padding: 4px 12px; }
 
 /* ---- time grid (Today + 3 day) */
 .cal-day { height: 100%; display: flex; flex-direction: column; position: relative; }

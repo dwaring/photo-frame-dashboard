@@ -39,6 +39,12 @@
   function hero() {
     var e = App.nextEvent(), now = App.now();
     if (!e) {
+      if (!D.calendar || D.calendar.state !== 'synced') {
+        return '<div class="h-hero h-hero--empty" data-go="calendar">' +
+          '<div class="label label--light">Calendar</div>' +
+          '<div class="h-hero-title serif">' + App.esc(D.calendar ? D.calendar.label.replace(/^Google · /, '') : 'Not connected') + '</div>' +
+          '<div class="h-hero-meta">Open Calendar to check the connection.</div></div>';
+      }
       var tomorrow = App.timedOn(App.addDays(now, 1))[0];
       return '<div class="h-hero h-hero--empty" data-go="calendar">' +
         '<div class="label label--light">Rest of today</div>' +
