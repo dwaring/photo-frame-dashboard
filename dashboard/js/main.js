@@ -5,6 +5,7 @@ import './icons.js';
 import './data.js';
 import './personal-config.js';
 import './app.js';
+import './night-mode.js';
 import './weather.js';
 import './google-calendar.js';
 import './system.js';

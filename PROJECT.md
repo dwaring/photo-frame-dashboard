@@ -155,3 +155,12 @@ Spotify is for now-playing or playback control; shared shopping field
 mapping; hosted authentication; Android kiosk/browser setup and offline policy.
 Access-protected dashboard, weather, and Todoist routes are deployed; hosted calendar implementation is ready; Google callback configuration and account consent remain pending.
 An always-on Mac/home server is not a deployment option.
+
+## Household quiet hours
+
+From 22:30 inclusive to 06:00 exclusive in Australia/Adelaide, the dashboard
+applies a black overlay: 45% opacity during interaction and 75% in the ambient
+photo screensaver. It updates every 15 seconds and on return to the app. This
+softens text and photos without changing iPad hardware brightness or OS power
+settings. Boundary and daylight-saving timezone tests pass; device appearance
+remains to be verified.

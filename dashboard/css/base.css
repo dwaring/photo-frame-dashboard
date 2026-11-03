@@ -251,3 +251,12 @@ button.card:active, .h-hero:active, .h-photo:active { transform: scale(.985); }
 }
 .diag b { color: #fff; }
 .diag u { text-decoration: none; color: #aaa; }
+
+/* Quiet hours: soften all UI, with deeper dimming for the idle photo frame.
+   A black overlay avoids expensive full-screen image filters on old WebKit. */
+.stage::after {
+  content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  z-index: 100; pointer-events: none; background: #000; opacity: 0;
+}
+.stage.is-quiet-hours::after { opacity: .45; }
+.stage.is-quiet-hours[data-mode="ambient"]::after { opacity: .75; }
