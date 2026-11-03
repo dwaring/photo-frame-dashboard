@@ -57,6 +57,7 @@
       var data = await response.json();
       if (data.reason === 'local-unavailable') throw new Error('Local usage sync failed. Check that Codex is installed and signed in on this Mac, then retry.');
       if (!response.ok) throw new Error('Usage sync failed. Retry shortly.');
+      if (data.reason === 'service-not-deployed') throw new Error('The hosted usage service is not deployed. Administrator setup is required.');
       if (!data.connected) throw new Error(data.reason === 'not-configured' ? 'The hosted usage service has not been signed in yet.' : 'Usage is unavailable. Check the service connection.');
       if (data.source !== 'codex-account' || !Number.isFinite(Date.parse(data.syncedAt)) || !Array.isArray(data.quotas) || !data.summary || !Array.isArray(data.daily)) throw new Error('Invalid usage response.');
       V.data = data; V.error = '';

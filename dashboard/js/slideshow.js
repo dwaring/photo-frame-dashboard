@@ -60,7 +60,7 @@
     polaroid: function (ps, o) {
       var p = ps[0], m = App.photoMeta(p), rot = (Math.random() * 5 - 2.5).toFixed(1);
       return '<div class="slide slide--polaroid"><img class="blurfill" src="' + src(p) + '" alt="">' +
-        '<figure class="polaroid polaroid--' + p.o + '" style="transform:rotate(' + rot + 'deg)"><div class="polaroid-img"><img src="' + src(p, true) + '" alt=""></div>' +
+        '<figure class="polaroid polaroid--' + p.o + '" style="transform:translate(-50%, -52%) rotate(' + rot + 'deg)"><div class="polaroid-img"><img src="' + src(p, true) + '" alt=""></div>' +
         (o.captions && (m.place || o.dates !== false) ? '<figcaption class="serif"><i>' + (m.place ? App.esc(m.place) : '') + (o.dates === false ? '' : (m.place ? ', ' : '') + m.monthYear) + '</i></figcaption>' : '') + '</figure></div>';
     }
   };
@@ -103,8 +103,8 @@
     }
     var ps = [first];
     if (layout === 'pair') {
-      if (first.o !== 'p') { first = sibling(function (x) { return x.o === 'p'; }); ps = [first]; }
-      ps.push(sibling(function (x) { return first && x !== first && x.o === 'p' && x.tag === first.tag; }) || sibling(function (x) { return x !== first && x.o === 'p'; }));
+      // Prefer a matching portrait, but explicit Pair works with any orientation.
+      ps.push(sibling(function (x) { return x !== first && x.o === first.o && x.tag === first.tag; }) || sibling(function (x) { return x !== first; }));
     }
     if (layout === 'collage') {
       ps.push(sibling(function (x) { return x !== first; }));
@@ -145,7 +145,7 @@
     var s = this.pick();
     if (!s) {
       this.current = null;
-      this.el.innerHTML = '<div class="slide" style="display:grid;place-items:center">No photos imported</div>';
+      this.el.innerHTML = '<div class="slide" style="display:flex;align-items:center;justify-content:center">No photos imported</div>';
       this.restart();
       return;
     }

@@ -19,7 +19,8 @@ export default {
     if (path === '/api/chatgpt/usage') {
       // Fail closed if Access is absent: these are personal account statistics.
       if (!request.headers.get('Cf-Access-Jwt-Assertion')) return json({ error: 'Sign-in required' }, 401);
-      if (!env.CODEX_AUTH_JSON || !env.CHATGPT_USAGE) return json({ connected: false, reason: 'not-configured' });
+      if (!env.CHATGPT_USAGE) return json({ connected: false, reason: 'service-not-deployed' });
+      if (!env.CODEX_AUTH_JSON) return json({ connected: false, reason: 'not-configured' });
       try {
         return json(await env.CHATGPT_USAGE.getByName('personal').usage());
       } catch {
