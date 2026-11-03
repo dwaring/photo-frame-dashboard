@@ -22,8 +22,9 @@ bundled dashboard, third-party runtime or always-on development machine.
   dashboard, restricted to the owner address with a 24-hour application session.
   The original Worker-wide member protection was retained. Verified the public
   protected URL returns the Email / Send login code form using an iPad user-agent.
-  PIN completion and authenticated real-dashboard rendering on the iPad remain
-  pending user verification. No authentication codes or service secrets in source.
+  The user completed PIN sign-in on the iPad, then reported broken dashboard UI.
+  Web compatibility fixes are tracked in `../docs/ios-web-compatibility.md`.
+  No authentication codes or service secrets are in source.
 
 ## Build
 
@@ -88,6 +89,15 @@ the app bundle. Inspect any app data container before deleting data. Never remov
 shared `/var/mobile` data or change bootstrap packages for rollback.
 
 ## Kiosk controls
+
+Version 0.3 adds an asset-loading diagnostic after the user reported an unstyled
+dashboard after deployment. On dashboard page completion it records only document
+readiness, whether App exists, stage display/position, stylesheet count, and
+same-origin hashed asset status/MIME/size/HTML classification. It never records
+page text, forms, cookies, response bodies or URL queries. The private report is
+`Library/Caches/homekiosk-loading.json` in the app's runtime home. Maintenance's
+**Inspect asset loading** button repeats the check. It is diagnostic evidence,
+not a compatibility fix. No web/Access policy change accompanies this app update.
 
 Defaults to `https://home-dashboard.darrenwaring.workers.dev/#home`.
 Hold **three fingers for two seconds** anywhere to open maintenance. This is

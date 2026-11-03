@@ -241,13 +241,18 @@
   // Swipe left/right to change day (the only swipe gesture in the app)
   function swipe(el) {
     var sx, sy, st;
-    el.addEventListener('pointerdown', function (e) { sx = e.clientX; sy = e.clientY; st = Date.now(); });
-    el.addEventListener('pointerup', function (e) {
+    el.addEventListener(window.PointerEvent ? 'pointerdown' : 'touchstart', function (e) {
+      var point = e.touches ? e.touches[0] : e;
+      sx = point.clientX; sy = point.clientY; st = Date.now();
+    }, { passive: true });
+    el.addEventListener(window.PointerEvent ? 'pointerup' : 'touchend', function (e) {
       if (sx == null) return;
-      var dx = e.clientX - sx, dy = e.clientY - sy;
+      var point = e.changedTouches ? e.changedTouches[0] : e;
+      var dx = point.clientX - sx, dy = point.clientY - sy;
       sx = null;
       if (Math.abs(dx) > 90 && Math.abs(dy) < 60 && Date.now() - st < 700 && !e.target.closest('.cal-head')) nav(dx < 0 ? 1 : -1);
     });
+    el.addEventListener(window.PointerEvent ? 'pointercancel' : 'touchcancel', function () { sx = null; });
   }
 
   // ------------------------------------------------------------ sheets

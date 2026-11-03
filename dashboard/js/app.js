@@ -77,7 +77,7 @@
   };
   App.pstyle = function (p) {
     if (typeof p === 'string') p = App.person(p);
-    return '--c:' + p.color + ';--c-rgb:' + p.rgb + ';--c-ink:' + p.ink;
+    return '--c:' + p.color + ';--c-rgb:' + p.rgb.trim().split(/\s+/).join(', ') + ';--c-ink:' + p.ink;
   };
   App.avatar = function (p, size, cls) {
     if (typeof p === 'string') p = App.person(p);
@@ -234,7 +234,8 @@
   App.hold = function (el, ms, cb) {
     var t = null;
     el.style.setProperty('--hold', ms + 'ms');
-    el.addEventListener('pointerdown', function () {
+    el.addEventListener(window.PointerEvent ? 'pointerdown' : 'touchstart', function () {
+      clearTimeout(t);
       if (cb.enabled && !cb.enabled()) return;
       el.classList.add('is-holding');
       t = setTimeout(function () { t = null; el.classList.remove('is-holding'); cb.done(); }, ms);
@@ -243,11 +244,16 @@
       if (!t) return;
       clearTimeout(t); t = null;
       el.classList.remove('is-holding');
-      if (cb.cancel && e.type === 'pointerup') cb.cancel();
+      if (cb.cancel && (e.type === 'pointerup' || e.type === 'touchend')) cb.cancel();
     }
     el.addEventListener('pointerup', cancel);
     el.addEventListener('pointerleave', cancel);
     el.addEventListener('pointercancel', cancel);
+    if (!window.PointerEvent) {
+      el.addEventListener('touchend', cancel);
+      el.addEventListener('touchcancel', cancel);
+      el.addEventListener('touchmove', cancel);
+    }
   };
 
   // ------------------------------------------------------------ modes: day / ambient
@@ -305,9 +311,10 @@
     });
     $('#rail').addEventListener('click', function (e) {
       var b = e.target.closest('[data-go]');
-      if (b && e.detail === 0) App.go(b.dataset.go);
+      if (b && (!window.PointerEvent || e.detail === 0)) App.go(b.dataset.go);
     });
     document.addEventListener('pointerdown', App.resetIdle, true);
+    if (!window.PointerEvent) document.addEventListener('touchstart', App.resetIdle, { capture: true, passive: true });
     window.addEventListener('hashchange', function () { App.go(location.hash.slice(1)); });
     App.go(location.hash.slice(1) || 'home');
     tick();

@@ -1,6 +1,6 @@
 /* Transform/opacity animations keep the tablet's painting work small. */
-.celebration { position: absolute; inset: 0; z-index: 150; pointer-events: none; overflow: hidden; }
-.celebration::before { content: ""; position: absolute; inset: 0; background: rgb(24 32 44 / 70%); animation: celebration-backdrop 2.8s ease both; }
+.celebration { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 150; pointer-events: none; overflow: hidden; }
+.celebration::before { content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(24, 32, 44, .7); animation: celebration-backdrop 2.8s ease both; }
 .celebration-flight { position: absolute; left: 50%; top: 35%; width: 240px; height: 220px; animation: celebration-fly 2.8s ease-in-out both; }
 .celebration-flight svg { position: relative; width: 100%; height: 100%; animation: celebration-wiggle .45s ease-in-out infinite alternate; }
 .celebration-trail { position: absolute; right: 65%; top: 42%; width: 310px; height: 36px; border-radius: 50%; background: linear-gradient(#f392b2 0 25%, #ffda72 25% 50%, #97d3a7 50% 75%, #83cbdf 75%); opacity: .75; }

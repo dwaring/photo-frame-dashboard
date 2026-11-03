@@ -16,6 +16,7 @@ static NSString *const DefaultURL = @"https://home-dashboard.darrenwaring.worker
 @property(nonatomic) BOOL testing;
 @property(nonatomic) BOOL active;
 @property(nonatomic) BOOL isolationAvailable;
+@property(nonatomic, copy) NSString *loadingReport;
 @end
 
 @implementation KioskController
@@ -174,7 +175,8 @@ static NSString *const DefaultURL = @"https://home-dashboard.darrenwaring.worker
     UIStackView *stack = [[UIStackView alloc] initWithArrangedSubviews:@[label, self.urlField,
         [self button:@"Save URL and open dashboard" action:@selector(saveURL)],
         [self button:@"Reload configured dashboard" action:@selector(reloadFromMaintenance)],
-        [self button:@"Test page (offline)" action:@selector(testFromMaintenance)], self.details]];
+        [self button:@"Test page (offline)" action:@selector(testFromMaintenance)],
+        [self button:@"Inspect asset loading" action:@selector(captureLoadingDiagnostics)], self.details]];
     stack.axis = UILayoutConstraintAxisVertical;
     stack.spacing = 12;
     stack.translatesAutoresizingMaskIntoConstraints = NO;
@@ -198,11 +200,35 @@ static NSString *const DefaultURL = @"https://home-dashboard.darrenwaring.worker
 }
 - (void)reloadFromMaintenance { [self closeMaintenance]; [self loadDashboard]; }
 - (void)testFromMaintenance { [self closeMaintenance]; [self loadTest]; }
+- (void)captureLoadingDiagnostics {
+    if (self.testing || ![self.webView.URL.host isEqualToString:[NSURL URLWithString:DefaultURL].host]) return;
+    NSURL *source = [NSBundle.mainBundle URLForResource:@"loading-diagnostics" withExtension:@"js"];
+    NSString *script = [NSString stringWithContentsOfURL:source encoding:NSUTF8StringEncoding error:nil];
+    if (!script) return;
+    [self.webView evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
+        if (!error) {
+            [self saveLoadingDiagnostics];
+            [self performSelector:@selector(saveLoadingDiagnostics) withObject:nil afterDelay:2];
+            [self performSelector:@selector(saveLoadingDiagnostics) withObject:nil afterDelay:8.5];
+        }
+    }];
+}
+- (void)saveLoadingDiagnostics {
+    if (![self.webView.URL.host isEqualToString:[NSURL URLWithString:DefaultURL].host]) return;
+    [self.webView evaluateJavaScript:@"JSON.stringify(window.__homeKioskLoading || {})" completionHandler:^(id result, NSError *error) {
+        if (error || ![result isKindOfClass:NSString.class]) return;
+        self.loadingReport = result;
+        NSString *cache = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+        [result writeToFile:[cache stringByAppendingPathComponent:@"homekiosk-loading.json"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        if (self.maintenance) self.details.text = [@"Asset loading report:\n" stringByAppendingString:result];
+    }];
+}
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation { [self setStatus:@"Loading…" visible:YES]; }
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self cancelRetry];
     // Successful loads do not clear the rolling recovery budget (crash loops).
     [self setStatus:webView.URL.isFileURL ? @"Bundled test page loaded." : @"Remote page loaded; verify sign-in and integrations on screen." visible:NO];
+    [self captureLoadingDiagnostics];
 }
 - (void)showError:(NSError *)error {
     if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled) return;

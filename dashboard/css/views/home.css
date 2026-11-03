@@ -67,7 +67,7 @@
   width: 100%; min-width: 0; overflow: hidden;
   display: flex; flex-direction: column; gap: 1px;
   min-height: 60px; padding: 7px 12px; border-radius: 12px;
-  background: rgb(var(--c-rgb) / .12);
+  background: rgba(var(--c-rgb), .12);
 }
 .h-ev-t { font-size: 16px; font-weight: 800; font-stretch: 70%; font-variant-numeric: tabular-nums; color: var(--ink-2); }
 .h-ev-n { display: block; width: 100%; font-size: 18px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

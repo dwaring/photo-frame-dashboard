@@ -19,6 +19,7 @@ xcrun --sdk iphoneos clang -arch arm64 -isysroot "$sdk_path" \
   -framework UIKit -framework Foundation -framework WebKit -o "$app/HomeKiosk"
 cp Info.plist "$app/Info.plist"
 cp Resources/test.html "$app/test.html"
+cp Resources/loading-diagnostics.js "$app/loading-diagnostics.js"
 cp Entitlements.plist build/Entitlements.plist
 python3 scripts/build-icons.py
 plutil -lint "$app/Info.plist"

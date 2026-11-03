@@ -1,4 +1,6 @@
 // Entry point. Order matters: each module attaches to the shared window.App.
+import './compat.js';
+import './legacy-layout.js';
 import './icons.js';
 import './data.js';
 import './personal-config.js';

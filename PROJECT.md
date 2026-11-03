@@ -42,7 +42,21 @@ Cloudflare-account login stalled after selecting the Cloudflare identity provide
 With explicit user approval, a hostname-specific owner-email/PIN Access app with
 a 24-hour session was added; the original Worker-wide protection was retained.
 An unauthenticated check using the iPad user-agent returns the email-code form.
-PIN completion and authenticated dashboard rendering on the iPad remain pending.
+The user completed PIN sign-in on the iPad, then reported that the dashboard UI
+was broken. A local compatibility build now targets Safari 12 as well as Chrome
+106, adds inactive-view visibility and touch-navigation fallbacks, and supplies
+missing request/weather APIs and legacy flex spacing. Production build and 12
+targeted tests pass. Deployed with user approval on 2026-11-03 as Worker version
+70c40624-70d3-4f71-b8e9-8d105c5521bb; unauthenticated requests still receive the
+email-code Access form. On-device layout verification is pending.
+The standalone syntax-check helper was killed by iOS. A later syntax-only check
+inside the running WebView accepted the bundle. On-device diagnostics then
+showed the current assets return HTTP 200 to credentialed XHR, but the linked
+CSS was not applied and App was absent. An additional build correction sets
+same-origin asset tags to use-credentials, as required by Cloudflare Access;
+deployed as 46987981-c213-4739-bf4a-14b592d1d916. The next device report confirmed
+App present, 614 readable CSS rules and the intended grid/absolute stage layout.
+Complete visual confirmation remains pending. See docs/ios-web-compatibility.md.
 The wrapper does not upgrade iOS WebKit. See `ios-kiosk/README.md` for build,
 installation, maintenance controls, rollback and remaining checks. No web
 deployment or repository push was performed.

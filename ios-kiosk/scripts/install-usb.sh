@@ -44,6 +44,7 @@ ldid -h "$app/HomeKiosk"
 chown -R root:wheel "$app"
 chmod 755 "$app" "$app/HomeKiosk"
 chmod 644 "$app/Info.plist" "$app/test.html" "$app"/*.png
+if test -f "$app/loading-diagnostics.js"; then chmod 644 "$app/loading-diagnostics.js"; fi
 if test -e /Applications/HomeKiosk.app; then
   # Stop only our app, never SpringBoard or a shared WebKit process.
   killall HomeKiosk 2>/dev/null || true
