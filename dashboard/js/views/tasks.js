@@ -69,7 +69,8 @@
       '<button class="ch-controls-toggle" data-toggle-controls aria-expanded="' + V.controlsOpen + '" aria-controls="chore-controls">' + (V.controlsOpen ? 'Hide controls' : 'Controls') + '</button>' +
       '</header>' +
       '<div id="chore-controls" class="ch-controls"' + (V.controlsOpen ? '' : ' hidden') + '><input aria-label="Chore date" type="date" data-date value="' + date() + '"><span role="status">' + App.esc(Chores.state.message) + (V.editing ? ' · Tap a chore to edit' : '') + '</span><button data-refresh>Refresh</button><button data-edit>' + (V.editing ? 'Finish editing' : 'Edit chores') + '</button><button data-add>Add chore</button><button data-celebration-preview>Preview celebration</button></div>' +
-      '<div class="ch-lanes">' + LANES.map(function (w) { return lane(w, r); }).join('') + '</div>' +
+      '<div class="ch-lanes"><div class="ch-stack">' + ['darren', 'nadine', 'any'].map(function (w) { return lane(w, r); }).join('') + '</div>' +
+      ['harvey', 'frankie'].map(function (w) { return lane(w, r); }).join('') + '</div>' +
       '</div>';
   }
 

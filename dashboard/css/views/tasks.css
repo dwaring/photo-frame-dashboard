@@ -9,7 +9,8 @@
 .t-bar { width: 120px; height: 12px; border-radius: 6px; background: var(--paper-2); overflow: hidden; }
 .t-bar i { display: block; height: 100%; background: var(--ink); border-radius: 6px; }
 
-.ch-lanes { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.ch-lanes { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) repeat(2, minmax(0, 1.25fr)); gap: 12px; }
+.ch-stack { min-height: 0; display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .ch-lane { display: flex; flex-direction: column; min-height: 0; background: var(--card); border-radius: var(--r); overflow: hidden; position: relative; }
 .ch-head { display: flex; align-items: center; gap: 8px; padding: 14px 10px 14px 12px; background: var(--c); color: var(--c-ink); }
 .ch-head > div:nth-child(2) { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.1; }
@@ -65,6 +66,20 @@
 .ch-week-row .is-today i { box-shadow: inset 0 0 0 3px var(--ink); }
 .ch-week-row .is-today { color: var(--ink); }
 .ch-week-row .is-future i { opacity: .4; }
+
+/* Keep the smaller household lists usable in their shared column. */
+.ch-stack .ch-head { padding: 6px 10px; flex: none; }
+.ch-stack .ch-list { padding: 6px; gap: 6px; }
+.ch-stack .ch { min-height: 48px; padding: 5px 8px; gap: 8px; }
+.ch-stack .ch-emoji { width: 36px; height: 36px; border-radius: 10px; }
+.ch-stack .ch-text b { font-size: 16px; }
+.ch-stack .ch-none { font-size: 18px; padding: 4px; }
+.ch-stack .ch-alldone { font-size: 24px; padding: 2px 0; }
+.ch-stack .ch-week { padding: 5px 10px; display: flex; align-items: center; gap: 8px; }
+.ch-stack .ch-week .label { font-size: 10px; margin-bottom: 0; }
+.ch-stack .ch-week-row { flex: 1; min-width: 0; }
+.ch-stack .ch-week-row span { flex-direction: row; justify-content: center; gap: 2px; font-size: 10px; }
+.ch-stack .ch-week-row i { width: 10px; height: 10px; border-radius: 3px; }
 
 .ch-controls { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
 .ch-controls[hidden] { display: none; }
