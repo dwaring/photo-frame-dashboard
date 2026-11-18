@@ -25,7 +25,5 @@
 @keyframes celebration-step { to { transform: rotate(4deg) translateY(-12px); } }
 @keyframes celebration-message { 0%,12%,100% { opacity: 0; } 25%,85% { opacity: 1; } }
 @keyframes celebration-spark { 0%,28% { opacity: 0; transform: rotate(var(--angle)) translateX(20px); } 40% { opacity: 1; } 85%,100% { opacity: 0; transform: rotate(var(--angle)) translateX(var(--distance)) rotate(160deg); } }
-@media (prefers-reduced-motion: reduce) {
-  .celebration-flight, .celebration-sparks { display: none; }
-  .celebration-message, .celebration::before { animation: none; }
-}
+/* Chore rewards intentionally retain their brief animations on this family kiosk,
+   including when iOS Reduce Motion is enabled. Preview never changes chore data. */

@@ -41,6 +41,12 @@ need device verification. No jailbreak packages, reboot or respring were needed.
 Cloudflare-account login stalled after selecting the Cloudflare identity provider.
 With explicit user approval, a hostname-specific owner-email/PIN Access app with
 a 24-hour session was added; the original Worker-wide protection was retained.
+On 2026-11-18, with owner approval, the hostname-specific application's session
+was increased to one month and verified by reopening its saved Cloudflare settings.
+The owner email-PIN policy inherits the application timeout. Existing sessions
+may need a fresh sign-in to receive the longer lifetime. Device pairing for
+unattended authentication is not implemented; month-long device behavior remains
+to be verified. The Worker-wide application and global session settings were unchanged.
 An unauthenticated check using the iPad user-agent returns the email-code form.
 The user completed PIN sign-in on the iPad, then reported that the dashboard UI
 was broken. A local compatibility build now targets Safari 12 as well as Chrome
